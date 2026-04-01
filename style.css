@@ -301,6 +301,57 @@ main { padding: 0.75rem; max-width: 960px; margin: 0 auto; }
     font-style: italic;
 }
 
+/* ====== GRID CALENDAR VIEW ====== */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+
+.grid-day-header {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-light);
+    padding: 0.4rem 0;
+    letter-spacing: 0.5px;
+}
+
+.grid-cell {
+    border-radius: 6px;
+    padding: 0.35rem;
+    min-height: 90px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-cell:hover { border-color: rgba(255,255,255,0.3); }
+.grid-cell-dim { opacity: 0.3; }
+.grid-cell-today { box-shadow: 0 0 0 2px var(--papa-only), 0 0 12px rgba(52,152,219,0.3); }
+
+.grid-num {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.grid-status {
+    font-size: 0.5rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-bottom: 3px;
+}
+
+.grid-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: auto;
+}
+
 /* ====== MONTHLY SUMMARY ====== */
 .monthly-summary {
     margin-top: 1rem;
@@ -402,6 +453,11 @@ main { padding: 0.75rem; max-width: 960px; margin: 0 auto; }
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
+    .calendar-grid { gap: 2px; }
+    .grid-cell { min-height: 70px; padding: 0.25rem; }
+    .grid-num { font-size: 0.85rem; }
+    .grid-status { font-size: 0.45rem; }
+    .grid-tags .day-tag { font-size: 0.4rem; padding: 1px 2px; }
     .calendar { grid-template-columns: 1fr; gap: 2px; }
     .day-column { min-height: auto; display: flex; align-items: stretch; }
     .day-header {

@@ -84,8 +84,11 @@ function bindNavigation() {
         if (currentView === "week") {
             currentWeekStart.setDate(currentWeekStart.getDate() - 7);
         } else {
-            currentWeekStart.setMonth(currentWeekStart.getMonth() - 1, 1);
-            currentWeekStart = getMonday(currentWeekStart);
+            // Grid: go back one month
+            const ref = new Date(currentWeekStart);
+            ref.setDate(ref.getDate() + 3);
+            ref.setMonth(ref.getMonth() - 1, 1);
+            currentWeekStart = getMonday(ref);
         }
         renderCalendar();
     });
@@ -93,9 +96,11 @@ function bindNavigation() {
         if (currentView === "week") {
             currentWeekStart.setDate(currentWeekStart.getDate() + 7);
         } else {
-            const d = new Date(currentWeekStart);
-            d.setMonth(d.getMonth() + 1, 15);
-            currentWeekStart = getMonday(new Date(d.getFullYear(), d.getMonth(), 1));
+            // Grid: go forward one month
+            const ref = new Date(currentWeekStart);
+            ref.setDate(ref.getDate() + 3);
+            ref.setMonth(ref.getMonth() + 1, 1);
+            currentWeekStart = getMonday(ref);
         }
         renderCalendar();
     });
@@ -207,40 +212,26 @@ function renderCalendar() {
     const label = document.getElementById("week-label");
     cal.innerHTML = "";
 
+    // Grid view = separate render
+    if (currentView === "grid") {
+        renderGridCalendar(cal, label);
+        return;
+    }
+
     let days = [];
 
-    if (currentView === "week") {
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(currentWeekStart);
-            d.setDate(d.getDate() + i);
-            days.push(d);
-        }
-        const end = days[6];
-        const s = MONTHS_FR[days[0].getMonth()];
-        const e = MONTHS_FR[end.getMonth()];
-        label.textContent = s === e
-            ? `${days[0].getDate()} — ${end.getDate()} ${s} ${end.getFullYear()}`
-            : `${days[0].getDate()} ${s} — ${end.getDate()} ${e} ${end.getFullYear()}`;
-    } else {
-        // Month view: find the month from currentWeekStart
-        const mid = new Date(currentWeekStart);
-        mid.setDate(mid.getDate() + 3);
-        const year = mid.getFullYear();
-        const month = mid.getMonth();
-        label.textContent = `${MONTHS_FR[month]} ${year}`;
-
-        const first = new Date(year, month, 1);
-        const start = getMonday(first);
-        // Fill until we've passed the last day of month
-        const lastDay = new Date(year, month + 1, 0);
-        const end = new Date(lastDay);
-        // Extend to Sunday
-        while (end.getDay() !== 0) end.setDate(end.getDate() + 1);
-
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-            days.push(new Date(d));
-        }
+    // Week list view
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(currentWeekStart);
+        d.setDate(d.getDate() + i);
+        days.push(d);
     }
+    const end = days[6];
+    const s = MONTHS_FR[days[0].getMonth()];
+    const e = MONTHS_FR[end.getMonth()];
+    label.textContent = s === e
+        ? `${days[0].getDate()} — ${end.getDate()} ${s} ${end.getFullYear()}`
+        : `${days[0].getDate()} ${s} — ${end.getDate()} ${e} ${end.getFullYear()}`;
 
     const todayStr = formatDate(new Date());
     let monthNounouDays = 0;
@@ -407,6 +398,143 @@ function renderMonthlySummary(days, cost, d40, d70) {
     title.textContent = currentUser.role === "nounou"
         ? "Mes gains estimés"
         : "Coût nounou estimé";
+}
+
+/* ==================================================
+   4b. RENDU GRILLE CALENDRIER (vue carrés)
+   ================================================== */
+function renderGridCalendar(cal, label) {
+    // Determine which month to show
+    const ref = new Date(currentWeekStart);
+    ref.setDate(ref.getDate() + 3);
+    const year = ref.getFullYear();
+    const month = ref.getMonth();
+    label.textContent = `${MONTHS_FR[month]} ${year}`;
+
+    // Build days array for the grid (Monday-based)
+    const first = new Date(year, month, 1);
+    const start = getMonday(first);
+    const lastDay = new Date(year, month + 1, 0);
+    const end = new Date(lastDay);
+    while (end.getDay() !== 0) end.setDate(end.getDate() + 1);
+
+    const days = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        days.push(new Date(d));
+    }
+
+    // Switch to grid CSS
+    cal.className = "calendar-grid";
+
+    // Header row (day names)
+    const headerNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+    headerNames.forEach(name => {
+        const h = document.createElement("div");
+        h.className = "grid-day-header";
+        h.textContent = name;
+        cal.appendChild(h);
+    });
+
+    const todayStr = formatDate(new Date());
+    let monthNounouDays = 0, monthNounouCost = 0, monthDetail40 = 0, monthDetail70 = 0;
+    let monthCongesCommuns = [];
+
+    days.forEach(date => {
+        const dateStr = formatDate(date);
+        const inMonth = date.getMonth() === month;
+        const isToday = dateStr === todayStr;
+        const status = getDayStatus(dateStr);
+        const school = hasSchool(dateStr);
+        const vacances = isVacances(dateStr);
+        const ferie = isFerie(dateStr);
+        const nounou = nounouNeeded(dateStr);
+        const manual = getManualEvent(dateStr);
+        const isAnnulation = manual && manual.type === "annulation";
+
+        // Monthly stats
+        if (inMonth) {
+            if (nounou && !isAnnulation) {
+                const tarif = nounouTarif(dateStr);
+                monthNounouDays++;
+                monthNounouCost += tarif;
+                if (tarif === 40) monthDetail40++;
+                else monthDetail70++;
+            }
+            if (isAnnulation) monthNounouCost += CONFIG.TARIFS.annulation;
+            if (status === "both-off") monthCongesCommuns.push(date);
+        }
+
+        const cell = document.createElement("div");
+        cell.className = `grid-cell bg-${status}`;
+        if (!inMonth) cell.classList.add("grid-cell-dim");
+        if (isToday) cell.classList.add("grid-cell-today");
+
+        if (currentUser.role === "nounou" && !nounou && !isAnnulation) {
+            cell.style.opacity = "0.25";
+        }
+
+        if (currentUser.role === "admin") {
+            cell.style.cursor = "pointer";
+            cell.addEventListener("click", () => openModal(dateStr));
+        }
+
+        // Day number
+        const num = document.createElement("div");
+        num.className = "grid-num";
+        num.textContent = date.getDate();
+        cell.appendChild(num);
+
+        // Status text
+        const statusLabels = {
+            "both-work": "Les 2 travaillent",
+            "both-off": "Congé commun",
+            "papa-only": "Papa travaille",
+            "maman-only": "Maman travaille"
+        };
+        if (currentUser.role === "admin") {
+            const st = document.createElement("div");
+            st.className = "grid-status";
+            st.textContent = statusLabels[status] || "";
+            cell.appendChild(st);
+        }
+
+        // Tags container
+        const tags = document.createElement("div");
+        tags.className = "grid-tags";
+
+        if (nounou && !isAnnulation) {
+            tags.innerHTML += `<span class="day-tag tag-nounou">Nounou</span>`;
+            tags.innerHTML += `<span class="day-tag tag-prix">${nounouTarif(dateStr)} €</span>`;
+        }
+        if (isAnnulation) {
+            tags.innerHTML += `<span class="day-tag tag-annulation">Annulé ${CONFIG.TARIFS.annulation} €</span>`;
+        }
+        if (vacances) {
+            tags.innerHTML += `<span class="day-tag tag-vacances-saku">\u{1F3D6} Vac. Saku</span>`;
+        }
+        if (ferie) {
+            tags.innerHTML += `<span class="day-tag tag-ferie">Férié</span>`;
+        }
+        if (school === true) {
+            tags.innerHTML += `<span class="day-tag tag-ecole">École</span>`;
+        } else if (school === "matin") {
+            tags.innerHTML += `<span class="day-tag tag-ecole">École AM</span>`;
+        }
+
+        cell.appendChild(tags);
+
+        if (manual && manual.note) {
+            const note = document.createElement("div");
+            note.className = "day-note";
+            note.textContent = manual.note;
+            cell.appendChild(note);
+        }
+
+        cal.appendChild(cell);
+    });
+
+    renderMonthlySummary(monthNounouDays, monthNounouCost, monthDetail40, monthDetail70);
+    renderCongesCommuns(monthCongesCommuns);
 }
 
 function renderCongesCommuns(dates) {
