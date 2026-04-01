@@ -226,10 +226,10 @@ main { padding: 0.75rem; max-width: 960px; margin: 0 auto; }
 .day-column.clickable:hover { border-color: var(--papa-only); cursor: pointer; }
 
 /* Couleur de fond selon le statut */
-.day-column.bg-both-work { background: #5e1a1a; border-color: var(--both-work); }
-.day-column.bg-both-off { background: #3d1535; border-color: var(--both-off); }
-.day-column.bg-papa-only { background: #132d50; border-color: var(--papa-only); }
-.day-column.bg-maman-only { background: #0d3b30; border-color: var(--maman-only); }
+.bg-both-work { background: #5e1a1a; border-color: var(--both-work); }
+.bg-both-off { background: #3d1535; border-color: var(--both-off); }
+.bg-papa-only { background: #132d50; border-color: var(--papa-only); }
+.bg-maman-only { background: #0d3b30; border-color: var(--maman-only); }
 
 .day-header {
     padding: 0.35rem;
