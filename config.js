@@ -1,42 +1,136 @@
-/**
- * Configuration du Planning Famille
- *
- * MODE LOCAL (par défaut) :
- *   Les données sont sauvegardées dans le navigateur (localStorage).
- *   Chaque navigateur/appareil a ses propres données.
- *
- * MODE GOOGLE SHEETS (partagé) :
- *   1. Créez un Google Sheet avec ces colonnes :
- *      date | type | start | end | note
- *      2026-04-01 | papa | 08:00 | 17:00 | Bureau
- *
- *   2. Allez dans Fichier > Partager > Publier sur le Web
- *      - Choisissez "Feuille 1" et "CSV"
- *      - Cliquez "Publier"
- *
- *   3. Copiez l'ID du Google Sheet (la longue chaîne dans l'URL)
- *      Exemple: https://docs.google.com/spreadsheets/d/VOTRE_ID_ICI/edit
- *
- *   4. Collez-le ci-dessous :
- */
+/* ============================================
+   Planning Famille — Configuration
+   ============================================ */
 
 const CONFIG = {
-    // Mettre l'ID de votre Google Sheet ici pour synchroniser
-    // Laisser vide ("") pour le mode local uniquement
+    /* --- Codes d'accès --- */
+    CODES: {
+        "Gabriel17": { name: "Gabriel", role: "admin" },
+        "Mieko18": { name: "Mieko", role: "admin" },
+        "Manu26": { name: "Emmanuel", role: "nounou" }
+    },
+
+    /* --- Google Sheets (optionnel) --- */
     GOOGLE_SHEET_ID: "",
 
-    // Noms affichés
-    PAPA_NAME: "Papa",
-    MAMAN_NAME: "Maman",
-    NOUNOU_NAME: "Nounou",
-    BABY_NAME: "Saku-Aloïs",
+    /* --- Tarifs nounou --- */
+    TARIFS: {
+        jour_ecole: 40,       // lun, mar, jeu, ven (hors vacances)
+        jour_complet: 70,     // mer, sam, dim, vacances
+        annulation: 20        // annulation < 24h
+    },
 
-    // Labels des types d'événements
-    EVENT_LABELS: {
-        papa: "Papa travaille",
-        maman: "Maman travaille",
-        nounou: "Nounou garde",
-        both: "Papa + Maman",
-        free: "Repos"
+    /* --- Horaires parents --- */
+    HORAIRES: {
+        gabriel_semaine: "14h-15h",
+        gabriel_weekend: "~16h",
+        mieko: "11h — 23h"
+    },
+
+    /* --- Cycle Mieko (référence) --- */
+    MIEKO_CYCLE: {
+        refDate: "2026-04-02",   // jour 0 = repos jour 1
+        // mod 4 : 0,1 = repos / 2,3 = travail
+    },
+
+    /* --- Vacances scolaires Zone B 2025-2026 --- */
+    VACANCES: [
+        { debut: "2025-10-18", fin: "2025-11-03", nom: "Toussaint" },
+        { debut: "2025-12-20", fin: "2026-01-05", nom: "Noël" },
+        { debut: "2026-02-14", fin: "2026-03-02", nom: "Hiver" },
+        { debut: "2026-04-11", fin: "2026-04-27", nom: "Printemps" },
+        { debut: "2026-07-04", fin: "2026-09-01", nom: "Été" }
+    ],
+
+    /* --- Jours fériés 2026 --- */
+    JOURS_FERIES: [
+        "2026-01-01", // Jour de l'An
+        "2026-04-06", // Lundi de Pâques
+        "2026-05-01", // Fête du Travail
+        "2026-05-08", // Victoire 1945
+        "2026-05-14", // Ascension
+        "2026-05-15", // Pont Ascension
+        "2026-05-25", // Pentecôte
+        "2026-07-14", // Fête nationale
+        "2026-08-15", // Assomption
+        "2026-11-01", // Toussaint
+        "2026-11-11", // Armistice
+        "2026-12-25", // Noël
+    ],
+
+    /* --- Planning Gabriel (SEMITAN) ---
+       Clé = date, Valeur = type
+       "travail" | "repos" | "xna" | "malade"
+    */
+    GABRIEL_PLANNING: {
+        // Mars 2026
+        "2026-03-23": "travail", "2026-03-24": "travail",
+        "2026-03-25": "repos_accepte", "2026-03-26": "repos_accepte",
+        "2026-03-27": "repos_accepte", "2026-03-28": "repos_accepte",
+        "2026-03-29": "repos_accepte", "2026-03-30": "repos_accepte",
+        "2026-03-31": "repos_accepte",
+        // Avril 2026
+        "2026-04-01": "repos", "2026-04-02": "travail", "2026-04-03": "travail",
+        "2026-04-04": "travail", "2026-04-05": "repos",
+        "2026-04-06": "xna", "2026-04-07": "repos",
+        "2026-04-08": "travail", "2026-04-09": "travail",
+        "2026-04-10": "xna", "2026-04-11": "repos", "2026-04-12": "repos",
+        "2026-04-13": "travail", "2026-04-14": "travail",
+        "2026-04-15": "travail", "2026-04-16": "xna",
+        "2026-04-17": "repos", "2026-04-18": "travail", "2026-04-19": "travail",
+        "2026-04-20": "travail", "2026-04-21": "repos",
+        "2026-04-22": "xna", "2026-04-23": "xna", "2026-04-24": "xna",
+        "2026-04-25": "repos", "2026-04-26": "repos",
+        "2026-04-27": "xna", "2026-04-28": "travail",
+        "2026-04-29": "repos", "2026-04-30": "travail",
+        // Mai 2026
+        "2026-05-01": "travail", "2026-05-02": "repos", "2026-05-03": "repos",
+        "2026-05-04": "xna", "2026-05-05": "xna",
+        "2026-05-06": "repos", "2026-05-07": "xna",
+        "2026-05-08": "xna", "2026-05-09": "xna",
+        "2026-05-10": "repos", "2026-05-11": "travail",
+        "2026-05-12": "repos", "2026-05-13": "travail",
+        "2026-05-14": "xna", "2026-05-15": "travail",
+        "2026-05-16": "repos", "2026-05-17": "repos",
+        "2026-05-18": "xna", "2026-05-19": "xna",
+        "2026-05-20": "xna", "2026-05-21": "repos", "2026-05-22": "repos",
+        "2026-05-23": "xna", "2026-05-24": "xna",
+        "2026-05-25": "xna", "2026-05-26": "repos",
+        "2026-05-27": "travail", "2026-05-28": "travail",
+        "2026-05-29": "travail", "2026-05-30": "travail",
+        "2026-05-31": "repos",
+        // Juin 2026
+        "2026-06-01": "repos", "2026-06-02": "xna",
+        "2026-06-03": "xna", "2026-06-04": "xna", "2026-06-05": "xna",
+        "2026-06-06": "repos", "2026-06-07": "repos",
+        "2026-06-08": "travail", "2026-06-09": "travail",
+        "2026-06-10": "repos", "2026-06-11": "travail",
+        "2026-06-12": "travail", "2026-06-13": "travail",
+        "2026-06-14": "repos",
+        "2026-06-15": "xna", "2026-06-16": "repos",
+        "2026-06-17": "xna", "2026-06-18": "xna",
+        "2026-06-19": "xna", "2026-06-20": "repos", "2026-06-21": "repos",
+        "2026-06-22": "travail", "2026-06-23": "travail",
+        "2026-06-24": "travail", "2026-06-25": "repos", "2026-06-26": "repos",
+        "2026-06-27": "travail", "2026-06-28": "travail",
+        "2026-06-29": "travail", "2026-06-30": "repos",
+        // Juillet 2026
+        "2026-07-01": "xna", "2026-07-02": "xna",
+        "2026-07-03": "xna", "2026-07-04": "xna",
+        "2026-07-05": "repos", "2026-07-06": "repos",
+        "2026-07-07": "travail", "2026-07-08": "travail",
+        "2026-07-09": "travail", "2026-07-10": "xna",
+        "2026-07-11": "repos", "2026-07-12": "repos",
+        // Vacances été
+        "2026-07-13": "repos_accepte", "2026-07-14": "repos_accepte",
+        "2026-07-15": "repos_accepte", "2026-07-16": "repos_accepte",
+        "2026-07-17": "repos_accepte", "2026-07-18": "repos_accepte",
+        "2026-07-19": "repos_accepte", "2026-07-20": "repos_accepte",
+        "2026-07-21": "repos_accepte", "2026-07-22": "repos_accepte",
+        "2026-07-23": "repos_accepte", "2026-07-24": "repos_accepte",
+        "2026-07-25": "repos_accepte", "2026-07-26": "repos_accepte",
+        "2026-07-27": "repos_accepte", "2026-07-28": "repos_accepte",
+        "2026-07-29": "repos_accepte", "2026-07-30": "repos_accepte",
+        "2026-07-31": "repos_accepte",
     }
 };

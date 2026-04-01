@@ -3,76 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planning Famille</title>
+    <title>Planning Famille — Saku-Aloïs</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="header-top">
+
+    <!-- ====== ECRAN DE CONNEXION ====== -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-icon">👶</div>
             <h1>Planning Famille</h1>
-            <p class="subtitle">Saku-Aloïs</p>
-        </div>
-        <nav class="week-nav">
-            <button id="prev-week" aria-label="Semaine précédente">&larr;</button>
-            <span id="week-label"></span>
-            <button id="next-week" aria-label="Semaine suivante">&rarr;</button>
-            <button id="today-btn" class="btn-today">Aujourd'hui</button>
-        </nav>
-        <div class="legend">
-            <span class="legend-item"><span class="dot dot-papa"></span>Papa</span>
-            <span class="legend-item"><span class="dot dot-maman"></span>Maman</span>
-            <span class="legend-item"><span class="dot dot-nounou"></span>Nounou</span>
-            <span class="legend-item"><span class="dot dot-both"></span>Tous les 2</span>
-            <span class="legend-item"><span class="dot dot-free"></span>Repos</span>
-        </div>
-    </header>
-
-    <main>
-        <div id="calendar" class="calendar"></div>
-    </main>
-
-    <div id="modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-title"></h2>
-                <button id="modal-close" class="modal-close-btn">&times;</button>
+            <p class="login-subtitle">Saku-Aloïs</p>
+            <div class="code-input-wrapper">
+                <input type="password" id="code-input" maxlength="20" placeholder="Entrez votre code"
+                       autocomplete="off">
+                <p id="code-error" class="code-error hidden">Code incorrect</p>
             </div>
-            <form id="event-form">
-                <div class="form-group">
-                    <label for="event-type">Qui ?</label>
-                    <select id="event-type">
-                        <option value="papa">Papa travaille</option>
-                        <option value="maman">Maman travaille</option>
-                        <option value="nounou">Nounou garde</option>
-                        <option value="both">Papa + Maman travaillent</option>
-                        <option value="free">Repos famille</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="event-start">Début</label>
-                    <input type="time" id="event-start" value="08:00">
-                </div>
-                <div class="form-group">
-                    <label for="event-end">Fin</label>
-                    <input type="time" id="event-end" value="17:00">
-                </div>
-                <div class="form-group">
-                    <label for="event-note">Note</label>
-                    <input type="text" id="event-note" placeholder="Optionnel...">
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-save">Enregistrer</button>
-                    <button type="button" id="btn-delete" class="btn btn-delete hidden">Supprimer</button>
-                </div>
-            </form>
+            <button id="login-btn" class="btn btn-login">Entrer</button>
         </div>
     </div>
 
-    <div id="config-banner" class="config-banner hidden">
-        <p>Pour synchroniser avec Google Sheets, ajoutez votre ID de feuille dans <code>config.js</code></p>
-        <button id="dismiss-banner">OK</button>
+    <!-- ====== APP PRINCIPALE ====== -->
+    <div id="app" class="hidden">
+        <header>
+            <div class="header-top">
+                <div class="header-left">
+                    <h1>Planning Famille</h1>
+                    <p class="subtitle">Saku-Aloïs</p>
+                </div>
+                <div class="header-right">
+                    <span id="user-name" class="user-badge"></span>
+                    <button id="logout-btn" class="btn-icon" title="Déconnexion">&#x2715;</button>
+                </div>
+            </div>
+
+            <nav class="week-nav">
+                <button id="prev-week" aria-label="Semaine précédente">&larr;</button>
+                <span id="week-label"></span>
+                <button id="next-week" aria-label="Semaine suivante">&rarr;</button>
+                <button id="today-btn" class="btn-today">Aujourd'hui</button>
+            </nav>
+
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="week">Semaine</button>
+                <button class="view-btn" data-view="month">Mois</button>
+            </div>
+
+            <div id="legend" class="legend">
+                <span class="legend-item"><span class="dot dot-papa"></span>Papa</span>
+                <span class="legend-item"><span class="dot dot-maman"></span>Maman</span>
+                <span class="legend-item"><span class="dot dot-nounou"></span>Nounou</span>
+                <span class="legend-item"><span class="dot dot-conge-commun"></span>Congé commun</span>
+                <span class="legend-item"><span class="dot dot-vacances"></span>Vacances</span>
+                <span class="legend-item"><span class="dot dot-ecole"></span>École</span>
+            </div>
+        </header>
+
+        <main>
+            <div id="calendar" class="calendar"></div>
+
+            <!-- ====== RÉSUMÉ MENSUEL ====== -->
+            <div id="monthly-summary" class="monthly-summary">
+                <h3 id="summary-title">Résumé du mois</h3>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <span class="summary-label">Jours de garde</span>
+                        <span id="summary-days" class="summary-value">—</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Estimation gains</span>
+                        <span id="summary-cost" class="summary-value cost">—</span>
+                    </div>
+                    <div class="summary-card summary-card-wide">
+                        <span class="summary-label">Détail</span>
+                        <span id="summary-detail" class="summary-detail">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== CONGÉS COMMUNS (admin only) ====== -->
+            <div id="conges-communs" class="conges-communs hidden">
+                <h3>Congés communs ce mois</h3>
+                <div id="conges-list" class="conges-list"></div>
+            </div>
+        </main>
+
+        <!-- ====== MODAL AJOUT/MODIF ====== -->
+        <div id="modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title"></h2>
+                    <button id="modal-close" class="modal-close-btn">&times;</button>
+                </div>
+                <form id="event-form">
+                    <div class="form-group">
+                        <label for="event-type">Type</label>
+                        <select id="event-type">
+                            <option value="nounou">Nounou garde</option>
+                            <option value="annulation">Annulation garde</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-note">Note</label>
+                        <input type="text" id="event-note" placeholder="Optionnel...">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-save">Enregistrer</button>
+                        <button type="button" id="btn-delete" class="btn btn-delete hidden">Supprimer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="config.js"></script>
