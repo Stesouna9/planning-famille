@@ -1,0 +1,432 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --papa: #4A90D9;
+    --maman: #E87CA0;
+    --nounou: #F5A623;
+    --both: #7B68EE;
+    --free: #50C878;
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --text: #2d3436;
+    --text-light: #636e72;
+    --border: #e0e0e0;
+    --radius: 12px;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+header {
+    background: var(--card);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-top {
+    text-align: center;
+    margin-bottom: 0.75rem;
+}
+
+h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.15rem;
+}
+
+.week-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.week-nav button {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text);
+    transition: background 0.2s;
+}
+
+.week-nav button:hover {
+    background: var(--border);
+}
+
+.btn-today {
+    font-size: 0.8rem !important;
+    font-weight: 500;
+}
+
+#week-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-width: 200px;
+    text-align: center;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-papa { background: var(--papa); }
+.dot-maman { background: var(--maman); }
+.dot-nounou { background: var(--nounou); }
+.dot-both { background: var(--both); }
+.dot-free { background: var(--free); }
+
+/* Calendar */
+main {
+    padding: 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.day-column {
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    min-height: 200px;
+}
+
+.day-header {
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.day-header .day-name {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-light);
+    letter-spacing: 0.5px;
+}
+
+.day-header .day-num {
+    display: block;
+    font-size: 1.1rem;
+    margin-top: 0.1rem;
+}
+
+.day-header.today {
+    background: var(--papa);
+    color: white;
+}
+
+.day-header.today .day-name {
+    color: rgba(255,255,255,0.8);
+}
+
+.day-events {
+    padding: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.event {
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: white;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    line-height: 1.3;
+}
+
+.event:hover {
+    opacity: 0.85;
+}
+
+.event-papa { background: var(--papa); }
+.event-maman { background: var(--maman); }
+.event-nounou { background: var(--nounou); }
+.event-both { background: var(--both); }
+.event-free { background: var(--free); }
+
+.event .event-time {
+    display: block;
+    font-size: 0.65rem;
+    opacity: 0.85;
+}
+
+.add-event-btn {
+    display: block;
+    width: 100%;
+    padding: 0.3rem;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: background 0.2s, border-color 0.2s;
+    margin-top: 0.2rem;
+}
+
+.add-event-btn:hover {
+    background: var(--bg);
+    border-color: var(--papa);
+    color: var(--papa);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+    line-height: 1;
+}
+
+.form-group {
+    margin-bottom: 0.75rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    color: var(--text-light);
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: var(--papa);
+    box-shadow: 0 0 0 3px rgba(74,144,217,0.15);
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-save {
+    background: var(--papa);
+    color: white;
+    flex: 1;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Config banner */
+.config-banner {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    z-index: 50;
+}
+
+.config-banner code {
+    background: var(--bg);
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.config-banner button {
+    background: var(--papa);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .calendar {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+
+    .day-column {
+        min-height: auto;
+    }
+
+    .day-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .day-header .day-name {
+        display: inline;
+        font-size: 0.75rem;
+    }
+
+    .day-header .day-num {
+        display: inline;
+        font-size: 0.95rem;
+        margin-top: 0;
+    }
+
+    .day-events {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .event {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .legend {
+        gap: 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 0.75rem 1rem;
+    }
+
+    .week-nav {
+        gap: 0.4rem;
+    }
+
+    #week-label {
+        font-size: 0.85rem;
+        min-width: 160px;
+    }
+}

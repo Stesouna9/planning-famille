@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Famille</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <h1>Planning Famille</h1>
+            <p class="subtitle">Saku-Aloïs</p>
+        </div>
+        <nav class="week-nav">
+            <button id="prev-week" aria-label="Semaine précédente">&larr;</button>
+            <span id="week-label"></span>
+            <button id="next-week" aria-label="Semaine suivante">&rarr;</button>
+            <button id="today-btn" class="btn-today">Aujourd'hui</button>
+        </nav>
+        <div class="legend">
+            <span class="legend-item"><span class="dot dot-papa"></span>Papa</span>
+            <span class="legend-item"><span class="dot dot-maman"></span>Maman</span>
+            <span class="legend-item"><span class="dot dot-nounou"></span>Nounou</span>
+            <span class="legend-item"><span class="dot dot-both"></span>Tous les 2</span>
+            <span class="legend-item"><span class="dot dot-free"></span>Repos</span>
+        </div>
+    </header>
+
+    <main>
+        <div id="calendar" class="calendar"></div>
+    </main>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <button id="modal-close" class="modal-close-btn">&times;</button>
+            </div>
+            <form id="event-form">
+                <div class="form-group">
+                    <label for="event-type">Qui ?</label>
+                    <select id="event-type">
+                        <option value="papa">Papa travaille</option>
+                        <option value="maman">Maman travaille</option>
+                        <option value="nounou">Nounou garde</option>
+                        <option value="both">Papa + Maman travaillent</option>
+                        <option value="free">Repos famille</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="event-start">Début</label>
+                    <input type="time" id="event-start" value="08:00">
+                </div>
+                <div class="form-group">
+                    <label for="event-end">Fin</label>
+                    <input type="time" id="event-end" value="17:00">
+                </div>
+                <div class="form-group">
+                    <label for="event-note">Note</label>
+                    <input type="text" id="event-note" placeholder="Optionnel...">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-save">Enregistrer</button>
+                    <button type="button" id="btn-delete" class="btn btn-delete hidden">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="config-banner" class="config-banner hidden">
+        <p>Pour synchroniser avec Google Sheets, ajoutez votre ID de feuille dans <code>config.js</code></p>
+        <button id="dismiss-banner">OK</button>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
