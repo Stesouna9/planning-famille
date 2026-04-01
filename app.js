@@ -365,8 +365,8 @@ function renderCalendar() {
 
         if (vacances) {
             const tag = document.createElement("span");
-            tag.className = "day-tag tag-vacances";
-            tag.textContent = vacances;
+            tag.className = "day-tag tag-vacances-saku";
+            tag.textContent = "\u{1F3D6} Vacances Saku";
             body.appendChild(tag);
         }
 
