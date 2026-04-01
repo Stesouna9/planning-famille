@@ -1,5 +1,5 @@
 /* ============================================
-   Planning Famille — app.js
+   Planning Famille — app.js (v2)
    ============================================ */
 
 const DAYS_FR = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
@@ -10,9 +10,13 @@ const MONTHS_FR = [
 ];
 
 const STORAGE_KEY = "planning-famille-manual";
+
+// State
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
 let currentWeekStart = getMonday(new Date());
-let currentUser = null; // { name, role }
-let currentView = "week";
+let currentUser = null;
+let currentView = "grid"; // default to grid
 let manualEvents = loadManualEvents();
 
 /* ==================================================
@@ -56,7 +60,6 @@ function showApp() {
     document.getElementById("app").classList.remove("hidden");
     document.getElementById("user-name").textContent = currentUser.name;
 
-    // Adjust legend for nounou
     if (currentUser.role === "nounou") {
         document.getElementById("legend").innerHTML = `
             <span class="legend-item"><span class="dot" style="background:var(--nounou)"></span>Garde</span>
@@ -73,7 +76,7 @@ function showApp() {
     bindNavigation();
     bindViewToggle();
     bindModal();
-    renderCalendar();
+    render();
 }
 
 /* ==================================================
@@ -81,32 +84,29 @@ function showApp() {
    ================================================== */
 function bindNavigation() {
     document.getElementById("prev-week").addEventListener("click", () => {
-        if (currentView === "week") {
+        if (currentView === "list") {
             currentWeekStart.setDate(currentWeekStart.getDate() - 7);
         } else {
-            // Grid: go back one month
-            const ref = new Date(currentWeekStart);
-            ref.setDate(ref.getDate() + 3);
-            ref.setMonth(ref.getMonth() - 1, 1);
-            currentWeekStart = getMonday(ref);
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
         }
-        renderCalendar();
+        render();
     });
     document.getElementById("next-week").addEventListener("click", () => {
-        if (currentView === "week") {
+        if (currentView === "list") {
             currentWeekStart.setDate(currentWeekStart.getDate() + 7);
         } else {
-            // Grid: go forward one month
-            const ref = new Date(currentWeekStart);
-            ref.setDate(ref.getDate() + 3);
-            ref.setMonth(ref.getMonth() + 1, 1);
-            currentWeekStart = getMonday(ref);
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
         }
-        renderCalendar();
+        render();
     });
     document.getElementById("today-btn").addEventListener("click", () => {
-        currentWeekStart = getMonday(new Date());
-        renderCalendar();
+        const now = new Date();
+        currentYear = now.getFullYear();
+        currentMonth = now.getMonth();
+        currentWeekStart = getMonday(now);
+        render();
     });
 }
 
@@ -116,11 +116,7 @@ function bindViewToggle() {
             document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             currentView = btn.dataset.view;
-            if (currentView === "month") {
-                const now = new Date(currentWeekStart);
-                currentWeekStart = getMonday(new Date(now.getFullYear(), now.getMonth(), 1));
-            }
-            renderCalendar();
+            render();
         });
     });
 }
@@ -128,31 +124,24 @@ function bindViewToggle() {
 /* ==================================================
    3. CALCULS AUTOMATIQUES
    ================================================== */
-
-/** Gabriel travaille ce jour ? */
 function gabrielWorks(dateStr) {
+    // Check manual override first
+    const manual = manualEvents[dateStr];
+    if (manual && manual.gabriel === "travail") return true;
+    if (manual && manual.gabriel === "repos") return false;
+    // Default: SEMITAN planning
     const status = CONFIG.GABRIEL_PLANNING[dateStr];
-    if (!status) return false;
     return status === "travail";
 }
 
-/** Gabriel est en repos/congé ce jour ? */
-function gabrielOff(dateStr) {
-    const status = CONFIG.GABRIEL_PLANNING[dateStr];
-    if (!status) return true; // pas de data = on ne sait pas, on suppose off
-    return status !== "travail";
-}
-
-/** Mieko travaille ce jour ? (cycle 2/2) */
 function miekoWorks(dateStr) {
     const ref = new Date("2026-04-02T00:00:00");
     const d = new Date(dateStr + "T00:00:00");
     const diff = Math.round((d - ref) / 86400000);
     const mod = ((diff % 4) + 4) % 4;
-    return mod === 2 || mod === 3; // 0,1 = repos / 2,3 = travail
+    return mod === 2 || mod === 3;
 }
 
-/** Est-ce un jour de vacances scolaires ? */
 function isVacances(dateStr) {
     for (const v of CONFIG.VACANCES) {
         if (dateStr >= v.debut && dateStr < v.fin) return v.nom;
@@ -160,44 +149,35 @@ function isVacances(dateStr) {
     return false;
 }
 
-/** Est-ce un jour férié ? */
 function isFerie(dateStr) {
     return CONFIG.JOURS_FERIES.includes(dateStr);
 }
 
-/** Saku a école ce jour ? */
 function hasSchool(dateStr) {
     const d = new Date(dateStr + "T00:00:00");
-    const dow = d.getDay(); // 0=dim, 6=sam
-    if (dow === 0 || dow === 6) return false;        // weekend
-    if (dow === 3) return "matin";                     // mercredi = matin seulement
-    if (isVacances(dateStr)) return false;             // vacances
-    if (isFerie(dateStr)) return false;                // férié
-    return true;                                        // lun, mar, jeu, ven
+    const dow = d.getDay();
+    if (dow === 0 || dow === 6) return false;
+    if (dow === 3) return "matin";
+    if (isVacances(dateStr)) return false;
+    if (isFerie(dateStr)) return false;
+    return true;
 }
 
-/** La nounou est-elle nécessaire ce jour ? (les 2 parents travaillent) */
 function nounouNeeded(dateStr) {
     return gabrielWorks(dateStr) && miekoWorks(dateStr);
 }
 
-/** Calcul du tarif nounou pour un jour donné */
 function nounouTarif(dateStr) {
     const d = new Date(dateStr + "T00:00:00");
     const dow = d.getDay();
-    // Vacances scolaires = toujours 70€
     if (isVacances(dateStr)) return CONFIG.TARIFS.jour_complet;
-    // Mercredi, Samedi, Dimanche = 70€
     if (dow === 0 || dow === 3 || dow === 6) return CONFIG.TARIFS.jour_complet;
-    // Jours d'école (lun, mar, jeu, ven) = 40€
     return CONFIG.TARIFS.jour_ecole;
 }
 
-/** Statut combiné du jour */
 function getDayStatus(dateStr) {
     const gWork = gabrielWorks(dateStr);
     const mWork = miekoWorks(dateStr);
-
     if (gWork && mWork) return "both-work";
     if (!gWork && !mWork) return "both-off";
     if (gWork && !mWork) return "papa-only";
@@ -205,434 +185,322 @@ function getDayStatus(dateStr) {
 }
 
 /* ==================================================
-   4. RENDU CALENDRIER
+   4. RENDU PRINCIPAL
    ================================================== */
-function renderCalendar() {
+function render() {
+    if (currentView === "grid") {
+        renderGrid();
+    } else {
+        renderList();
+    }
+}
+
+/* ---- Vue Grille (Calendrier mensuel) ---- */
+function renderGrid() {
     const cal = document.getElementById("calendar");
     const label = document.getElementById("week-label");
     cal.innerHTML = "";
+    cal.className = "cal-grid";
 
-    // Grid view = separate render
-    if (currentView === "grid") {
-        renderGridCalendar(cal, label);
-        return;
+    label.textContent = `${MONTHS_FR[currentMonth]} ${currentYear}`;
+
+    // Header row
+    const headerNames = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"];
+    headerNames.forEach(name => {
+        const h = document.createElement("div");
+        h.className = "g-header";
+        h.textContent = name;
+        cal.appendChild(h);
+    });
+
+    // Build grid days
+    const first = new Date(currentYear, currentMonth, 1);
+    const start = getMonday(first);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const end = new Date(lastDay);
+    while (end.getDay() !== 0) end.setDate(end.getDate() + 1);
+
+    const todayStr = formatDate(new Date());
+    let stats = { days: 0, cost: 0, d40: 0, d70: 0, conges: [] };
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const date = new Date(d);
+        const dateStr = formatDate(date);
+        const inMonth = date.getMonth() === currentMonth;
+        const isToday = dateStr === todayStr;
+        const info = getDayInfo(dateStr);
+
+        if (inMonth) calcStats(info, stats);
+
+        const cell = document.createElement("div");
+        cell.className = "g-cell";
+        if (!inMonth) cell.classList.add("g-dim");
+        if (isToday) cell.classList.add("g-today");
+
+        // Background color
+        cell.setAttribute("data-status", info.status);
+
+        if (currentUser.role === "nounou" && !info.nounou && !info.annulation) {
+            cell.classList.add("g-inactive");
+        }
+
+        if (currentUser.role === "admin") {
+            cell.addEventListener("click", () => openModal(dateStr));
+        }
+
+        // Build cell content
+        let html = `<div class="g-num">${date.getDate()}</div>`;
+
+        if (currentUser.role === "admin") {
+            html += `<div class="g-label g-label-${info.status}">${info.statusLabel}</div>`;
+        }
+
+        if (info.nounou && !info.annulation) {
+            html += `<div class="g-badge g-badge-nounou">${info.tarif} €</div>`;
+        }
+        if (info.annulation) {
+            html += `<div class="g-badge g-badge-cancel">Annulé</div>`;
+        }
+        if (info.vacances) {
+            html += `<div class="g-badge g-badge-vac">\u{1F3D6}</div>`;
+        }
+        if (info.ferie) {
+            html += `<div class="g-badge g-badge-ferie">F</div>`;
+        }
+        if (info.school === "matin") {
+            html += `<div class="g-badge g-badge-ecole">AM</div>`;
+        }
+
+        cell.innerHTML = html;
+        cal.appendChild(cell);
     }
 
-    let days = [];
+    renderSummary(stats);
+    renderCongesCommuns(stats.conges);
+}
 
-    // Week list view
+/* ---- Vue Liste (semaine) ---- */
+function renderList() {
+    const cal = document.getElementById("calendar");
+    const label = document.getElementById("week-label");
+    cal.innerHTML = "";
+    cal.className = "cal-list";
+
+    const days = [];
     for (let i = 0; i < 7; i++) {
         const d = new Date(currentWeekStart);
         d.setDate(d.getDate() + i);
         days.push(d);
     }
-    const end = days[6];
+
+    const endD = days[6];
     const s = MONTHS_FR[days[0].getMonth()];
-    const e = MONTHS_FR[end.getMonth()];
+    const e = MONTHS_FR[endD.getMonth()];
     label.textContent = s === e
-        ? `${days[0].getDate()} — ${end.getDate()} ${s} ${end.getFullYear()}`
-        : `${days[0].getDate()} ${s} — ${end.getDate()} ${e} ${end.getFullYear()}`;
+        ? `${days[0].getDate()} — ${endD.getDate()} ${s} ${endD.getFullYear()}`
+        : `${days[0].getDate()} ${s} — ${endD.getDate()} ${e} ${endD.getFullYear()}`;
 
     const todayStr = formatDate(new Date());
-    let monthNounouDays = 0;
-    let monthNounouCost = 0;
-    let monthDetail40 = 0;
-    let monthDetail70 = 0;
-    let monthCongesCommuns = [];
-
-    // Track which month we're summarizing
-    const refDate = currentView === "week" ? new Date(currentWeekStart) : null;
-    const summaryMonth = currentView === "month"
-        ? new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth() + (currentWeekStart.getDate() > 15 ? 1 : 0), 1).getMonth()
-        : null;
+    let stats = { days: 0, cost: 0, d40: 0, d70: 0, conges: [] };
 
     days.forEach(date => {
         const dateStr = formatDate(date);
         const isToday = dateStr === todayStr;
-        const status = getDayStatus(dateStr);
-        const school = hasSchool(dateStr);
-        const vacances = isVacances(dateStr);
-        const ferie = isFerie(dateStr);
-        const nounou = nounouNeeded(dateStr);
-        const manual = getManualEvent(dateStr);
-        const isAnnulation = manual && manual.type === "annulation";
+        const info = getDayInfo(dateStr);
+        calcStats(info, stats);
 
-        // Monthly calculations
-        const inCurrentMonth = currentView === "month"
-            ? date.getMonth() === (new Date(days[Math.floor(days.length / 2)]).getMonth())
-            : true;
+        const row = document.createElement("div");
+        row.className = "l-row";
+        row.setAttribute("data-status", info.status);
+        if (isToday) row.classList.add("l-today");
 
-        if (inCurrentMonth) {
-            if (nounou && !isAnnulation) {
-                const tarif = nounouTarif(dateStr);
-                monthNounouDays++;
-                monthNounouCost += tarif;
-                if (tarif === 40) monthDetail40++;
-                else monthDetail70++;
-            }
-            if (isAnnulation) {
-                monthNounouCost += CONFIG.TARIFS.annulation;
-            }
-            if (status === "both-off") {
-                monthCongesCommuns.push(date);
-            }
-        }
-
-        const col = document.createElement("div");
-        col.className = "day-column";
-
-        // Background color based on status
-        col.classList.add(`bg-${status}`);
-
-        // For nounou role, fade days she doesn't work
-        if (currentUser.role === "nounou" && !nounou && !isAnnulation) {
-            col.style.opacity = "0.25";
+        if (currentUser.role === "nounou" && !info.nounou && !info.annulation) {
+            row.classList.add("g-inactive");
         }
 
         if (currentUser.role === "admin") {
-            col.classList.add("clickable");
-            col.addEventListener("click", () => openModal(dateStr));
+            row.addEventListener("click", () => openModal(dateStr));
         }
 
-        // Header
-        const header = document.createElement("div");
-        header.className = "day-header" + (isToday ? " today" : "");
-        header.innerHTML = `
-            <span class="day-name">${DAYS_FR[date.getDay()]}</span>
-            <span class="day-num">${date.getDate()}</span>
-        `;
-        col.appendChild(header);
+        let html = `<div class="l-date">
+            <span class="l-day-name">${DAYS_FR[date.getDay()]}</span>
+            <span class="l-day-num">${date.getDate()}</span>
+        </div>`;
 
-        // Body
-        const body = document.createElement("div");
-        body.className = "day-body";
-
-        // Status indicator (admin sees who works)
+        html += `<div class="l-content">`;
         if (currentUser.role === "admin") {
-            const statusEl = document.createElement("div");
-            statusEl.className = `day-status status-${status}`;
-            const statusLabels = {
-                "both-work": "Les 2 travaillent",
-                "both-off": "Congé commun",
-                "papa-only": "Papa travaille",
-                "maman-only": "Maman travaille"
-            };
-            statusEl.textContent = statusLabels[status] || "";
-            body.appendChild(statusEl);
+            html += `<span class="l-status l-status-${info.status}">${info.statusLabel}</span>`;
         }
-
-        // Tags
-        if (nounou && !isAnnulation) {
-            const tag = document.createElement("span");
-            tag.className = "day-tag tag-nounou";
-            tag.textContent = currentUser.role === "nounou" ? "Garde" : "Nounou";
-            body.appendChild(tag);
-
-            // Prix tag
-            const prixTag = document.createElement("span");
-            prixTag.className = "day-tag tag-prix";
-            prixTag.textContent = nounouTarif(dateStr) + " €";
-            body.appendChild(prixTag);
+        if (info.nounou && !info.annulation) {
+            html += `<span class="l-tag l-tag-nounou">Nounou</span>`;
+            html += `<span class="l-tag l-tag-prix">${info.tarif} €</span>`;
         }
-
-        if (isAnnulation) {
-            const tag = document.createElement("span");
-            tag.className = "day-tag tag-annulation";
-            tag.textContent = "Annulé — " + CONFIG.TARIFS.annulation + " €";
-            body.appendChild(tag);
+        if (info.annulation) {
+            html += `<span class="l-tag l-tag-cancel">Annulé ${CONFIG.TARIFS.annulation} €</span>`;
         }
-
-        if (school === true) {
-            const tag = document.createElement("span");
-            tag.className = "day-tag tag-ecole";
-            tag.textContent = "École";
-            body.appendChild(tag);
-        } else if (school === "matin") {
-            const tag = document.createElement("span");
-            tag.className = "day-tag tag-ecole";
-            tag.textContent = "École matin";
-            body.appendChild(tag);
+        if (info.school === true) {
+            html += `<span class="l-tag l-tag-ecole">École</span>`;
+        } else if (info.school === "matin") {
+            html += `<span class="l-tag l-tag-ecole">École matin</span>`;
         }
-
-        if (vacances) {
-            const tag = document.createElement("span");
-            tag.className = "day-tag tag-vacances-saku";
-            tag.textContent = "\u{1F3D6} Vacances Saku";
-            body.appendChild(tag);
+        if (info.vacances) {
+            html += `<span class="l-tag l-tag-vac">\u{1F3D6} Vac. Saku</span>`;
         }
-
-        if (ferie) {
-            const tag = document.createElement("span");
-            tag.className = "day-tag tag-ferie";
-            tag.textContent = "Férié";
-            body.appendChild(tag);
+        if (info.ferie) {
+            html += `<span class="l-tag l-tag-ferie">Férié</span>`;
         }
-
-        // Manual note
-        if (manual && manual.note) {
-            const note = document.createElement("div");
-            note.className = "day-note";
-            note.textContent = manual.note;
-            body.appendChild(note);
+        if (info.note) {
+            html += `<span class="l-note">${info.note}</span>`;
         }
+        html += `</div>`;
 
-        col.appendChild(body);
-        cal.appendChild(col);
+        row.innerHTML = html;
+        cal.appendChild(row);
     });
 
-    // Update monthly summary
-    renderMonthlySummary(monthNounouDays, monthNounouCost, monthDetail40, monthDetail70);
-    renderCongesCommuns(monthCongesCommuns);
+    renderSummary(stats);
+    renderCongesCommuns(stats.conges);
 }
 
-function renderMonthlySummary(days, cost, d40, d70) {
-    document.getElementById("summary-days").textContent = days + " jour" + (days > 1 ? "s" : "");
-    document.getElementById("summary-cost").textContent = cost + " €";
+/* ---- Helpers ---- */
+function getDayInfo(dateStr) {
+    const status = getDayStatus(dateStr);
+    const manual = manualEvents[dateStr] || null;
+    const statusLabels = {
+        "both-work": "Les 2",
+        "both-off": "Repos",
+        "papa-only": "Papa",
+        "maman-only": "Maman"
+    };
+    return {
+        status,
+        statusLabel: statusLabels[status],
+        nounou: nounouNeeded(dateStr),
+        tarif: nounouTarif(dateStr),
+        school: hasSchool(dateStr),
+        vacances: isVacances(dateStr),
+        ferie: isFerie(dateStr),
+        annulation: manual && manual.type === "annulation",
+        note: manual ? manual.note : null,
+        dateStr
+    };
+}
+
+function calcStats(info, stats) {
+    if (info.nounou && !info.annulation) {
+        stats.days++;
+        stats.cost += info.tarif;
+        if (info.tarif === 40) stats.d40++; else stats.d70++;
+    }
+    if (info.annulation) stats.cost += CONFIG.TARIFS.annulation;
+    if (info.status === "both-off") {
+        const d = new Date(info.dateStr + "T00:00:00");
+        stats.conges.push(d);
+    }
+}
+
+function renderSummary(stats) {
+    document.getElementById("summary-days").textContent = stats.days + " jour" + (stats.days > 1 ? "s" : "");
+    document.getElementById("summary-cost").textContent = stats.cost + " €";
 
     let detail = "";
-    if (d40 > 0) detail += d40 + " jour" + (d40 > 1 ? "s" : "") + " × 40 € = " + (d40 * 40) + " €\n";
-    if (d70 > 0) detail += d70 + " jour" + (d70 > 1 ? "s" : "") + " × 70 € = " + (d70 * 70) + " €";
+    if (stats.d40 > 0) detail += stats.d40 + "j × 40€ = " + (stats.d40 * 40) + "€\n";
+    if (stats.d70 > 0) detail += stats.d70 + "j × 70€ = " + (stats.d70 * 70) + "€";
     document.getElementById("summary-detail").textContent = detail || "Aucune garde";
 
-    const title = document.getElementById("summary-title");
-    title.textContent = currentUser.role === "nounou"
-        ? "Mes gains estimés"
-        : "Coût nounou estimé";
-}
+    const period = currentView === "grid" ? "ce mois" : "cette semaine";
+    document.getElementById("summary-title").textContent =
+        currentUser.role === "nounou" ? `Mes gains estimés ${period}` : `Coût nounou ${period}`;
 
-/* ==================================================
-   4b. RENDU GRILLE CALENDRIER (vue carrés)
-   ================================================== */
-function renderGridCalendar(cal, label) {
-    // Determine which month to show
-    const ref = new Date(currentWeekStart);
-    ref.setDate(ref.getDate() + 3);
-    const year = ref.getFullYear();
-    const month = ref.getMonth();
-    label.textContent = `${MONTHS_FR[month]} ${year}`;
-
-    // Build days array for the grid (Monday-based)
-    const first = new Date(year, month, 1);
-    const start = getMonday(first);
-    const lastDay = new Date(year, month + 1, 0);
-    const end = new Date(lastDay);
-    while (end.getDay() !== 0) end.setDate(end.getDate() + 1);
-
-    const days = [];
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        days.push(new Date(d));
-    }
-
-    // Switch to grid CSS
-    cal.className = "calendar-grid";
-
-    // Header row (day names)
-    const headerNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-    headerNames.forEach(name => {
-        const h = document.createElement("div");
-        h.className = "grid-day-header";
-        h.textContent = name;
-        cal.appendChild(h);
-    });
-
-    const todayStr = formatDate(new Date());
-    let monthNounouDays = 0, monthNounouCost = 0, monthDetail40 = 0, monthDetail70 = 0;
-    let monthCongesCommuns = [];
-
-    days.forEach(date => {
-        const dateStr = formatDate(date);
-        const inMonth = date.getMonth() === month;
-        const isToday = dateStr === todayStr;
-        const status = getDayStatus(dateStr);
-        const school = hasSchool(dateStr);
-        const vacances = isVacances(dateStr);
-        const ferie = isFerie(dateStr);
-        const nounou = nounouNeeded(dateStr);
-        const manual = getManualEvent(dateStr);
-        const isAnnulation = manual && manual.type === "annulation";
-
-        // Monthly stats
-        if (inMonth) {
-            if (nounou && !isAnnulation) {
-                const tarif = nounouTarif(dateStr);
-                monthNounouDays++;
-                monthNounouCost += tarif;
-                if (tarif === 40) monthDetail40++;
-                else monthDetail70++;
-            }
-            if (isAnnulation) monthNounouCost += CONFIG.TARIFS.annulation;
-            if (status === "both-off") monthCongesCommuns.push(date);
-        }
-
-        const cell = document.createElement("div");
-        cell.className = `grid-cell bg-${status}`;
-        if (!inMonth) cell.classList.add("grid-cell-dim");
-        if (isToday) cell.classList.add("grid-cell-today");
-
-        if (currentUser.role === "nounou" && !nounou && !isAnnulation) {
-            cell.style.opacity = "0.25";
-        }
-
-        if (currentUser.role === "admin") {
-            cell.style.cursor = "pointer";
-            cell.addEventListener("click", () => openModal(dateStr));
-        }
-
-        // Day number
-        const num = document.createElement("div");
-        num.className = "grid-num";
-        num.textContent = date.getDate();
-        cell.appendChild(num);
-
-        // Status text
-        const statusLabels = {
-            "both-work": "Les 2 travaillent",
-            "both-off": "Congé commun",
-            "papa-only": "Papa travaille",
-            "maman-only": "Maman travaille"
-        };
-        if (currentUser.role === "admin") {
-            const st = document.createElement("div");
-            st.className = "grid-status";
-            st.textContent = statusLabels[status] || "";
-            cell.appendChild(st);
-        }
-
-        // Tags container
-        const tags = document.createElement("div");
-        tags.className = "grid-tags";
-
-        if (nounou && !isAnnulation) {
-            tags.innerHTML += `<span class="day-tag tag-nounou">Nounou</span>`;
-            tags.innerHTML += `<span class="day-tag tag-prix">${nounouTarif(dateStr)} €</span>`;
-        }
-        if (isAnnulation) {
-            tags.innerHTML += `<span class="day-tag tag-annulation">Annulé ${CONFIG.TARIFS.annulation} €</span>`;
-        }
-        if (vacances) {
-            tags.innerHTML += `<span class="day-tag tag-vacances-saku">\u{1F3D6} Vac. Saku</span>`;
-        }
-        if (ferie) {
-            tags.innerHTML += `<span class="day-tag tag-ferie">Férié</span>`;
-        }
-        if (school === true) {
-            tags.innerHTML += `<span class="day-tag tag-ecole">École</span>`;
-        } else if (school === "matin") {
-            tags.innerHTML += `<span class="day-tag tag-ecole">École AM</span>`;
-        }
-
-        cell.appendChild(tags);
-
-        if (manual && manual.note) {
-            const note = document.createElement("div");
-            note.className = "day-note";
-            note.textContent = manual.note;
-            cell.appendChild(note);
-        }
-
-        cal.appendChild(cell);
-    });
-
-    renderMonthlySummary(monthNounouDays, monthNounouCost, monthDetail40, monthDetail70);
-    renderCongesCommuns(monthCongesCommuns);
+    document.getElementById("conges-title").textContent =
+        `Congés communs ${period}`;
 }
 
 function renderCongesCommuns(dates) {
     const section = document.getElementById("conges-communs");
     const list = document.getElementById("conges-list");
-
     if (currentUser.role !== "admin" || dates.length === 0) {
         section.classList.add("hidden");
         return;
     }
-
     section.classList.remove("hidden");
     list.innerHTML = "";
     dates.forEach(d => {
         const chip = document.createElement("span");
         chip.className = "conge-chip";
-        chip.textContent = `${DAYS_FULL[d.getDay()]} ${d.getDate()}`;
+        chip.textContent = `${DAYS_FR[d.getDay()]} ${d.getDate()}`;
         list.appendChild(chip);
     });
 }
 
 /* ==================================================
-   5. MODAL (admin only — ajout/modif manuelle)
+   5. MODAL
    ================================================== */
 function bindModal() {
     const modal = document.getElementById("modal");
-    const form = document.getElementById("event-form");
-
     document.getElementById("modal-close").addEventListener("click", closeModal);
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-
-    form.addEventListener("submit", (e) => {
+    document.getElementById("event-form").addEventListener("submit", (e) => {
         e.preventDefault();
         saveManualEvent();
     });
-
     document.getElementById("btn-delete").addEventListener("click", () => {
-        const dateStr = document.getElementById("modal").dataset.date;
-        deleteManualEvent(dateStr);
+        deleteManualEvent(document.getElementById("modal").dataset.date);
         closeModal();
     });
 }
 
 function openModal(dateStr) {
     if (currentUser.role !== "admin") return;
-
     const modal = document.getElementById("modal");
-    const title = document.getElementById("modal-title");
-    const deleteBtn = document.getElementById("btn-delete");
     const d = new Date(dateStr + "T00:00:00");
-
-    title.textContent = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
+    document.getElementById("modal-title").textContent =
+        `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
     modal.dataset.date = dateStr;
-
-    const existing = getManualEvent(dateStr);
-    document.getElementById("event-type").value = existing ? existing.type : "nounou";
+    const existing = manualEvents[dateStr];
+    document.getElementById("event-gabriel").value = existing ? (existing.gabriel || "auto") : "auto";
+    document.getElementById("event-type").value = existing ? (existing.type || "") : "";
     document.getElementById("event-note").value = existing ? (existing.note || "") : "";
-    deleteBtn.classList.toggle("hidden", !existing);
-
+    document.getElementById("btn-delete").classList.toggle("hidden", !existing);
     modal.classList.remove("hidden");
 }
 
-function closeModal() {
-    document.getElementById("modal").classList.add("hidden");
-}
+function closeModal() { document.getElementById("modal").classList.add("hidden"); }
 
 function saveManualEvent() {
-    const modal = document.getElementById("modal");
-    const dateStr = modal.dataset.date;
+    const dateStr = document.getElementById("modal").dataset.date;
+    const gabriel = document.getElementById("event-gabriel").value;
+    const type = document.getElementById("event-type").value;
+    const note = document.getElementById("event-note").value.trim();
 
-    manualEvents[dateStr] = {
-        type: document.getElementById("event-type").value,
-        note: document.getElementById("event-note").value.trim()
-    };
+    // Only save if something changed
+    const data = {};
+    if (gabriel !== "auto") data.gabriel = gabriel;
+    if (type) data.type = type;
+    if (note) data.note = note;
 
+    if (Object.keys(data).length > 0) {
+        manualEvents[dateStr] = data;
+    } else {
+        delete manualEvents[dateStr];
+    }
     persistManualEvents();
     closeModal();
-    renderCalendar();
-    notifyNounou(dateStr, manualEvents[dateStr]);
+    render();
 }
 
 function deleteManualEvent(dateStr) {
     delete manualEvents[dateStr];
     persistManualEvents();
-    renderCalendar();
-}
-
-function getManualEvent(dateStr) {
-    return manualEvents[dateStr] || null;
+    render();
 }
 
 /* ==================================================
-   6. STOCKAGE LOCAL
+   6. STOCKAGE
    ================================================== */
 function loadManualEvents() {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch { return {}; }
 }
 
 function persistManualEvents() {
@@ -640,30 +508,7 @@ function persistManualEvents() {
 }
 
 /* ==================================================
-   7. NOTIFICATIONS (EmailJS — optionnel)
-   ================================================== */
-function notifyNounou(dateStr, event) {
-    // Si EmailJS est configuré dans config, envoyer une notification
-    if (!CONFIG.EMAILJS_SERVICE_ID) return;
-
-    const d = new Date(dateStr + "T00:00:00");
-    const label = event.type === "annulation" ? "ANNULATION" : "Modification";
-    const dateLabel = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
-
-    try {
-        emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
-            to_email: CONFIG.NOUNOU_EMAIL || "",
-            subject: `Planning Saku — ${label} le ${dateLabel}`,
-            message: `${label} sur le planning de Saku-Aloïs pour le ${dateLabel}.\n${event.note ? "Note: " + event.note : ""}\nConsultez le planning : ${CONFIG.SITE_URL || window.location.href}`,
-            from_name: currentUser.name
-        });
-    } catch (err) {
-        console.warn("Notification email non envoyée:", err);
-    }
-}
-
-/* ==================================================
-   8. UTILITAIRES
+   7. UTILITAIRES
    ================================================== */
 function getMonday(d) {
     const date = new Date(d);
@@ -675,8 +520,7 @@ function getMonday(d) {
 }
 
 function formatDate(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+    return d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0");
 }

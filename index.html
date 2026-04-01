@@ -2,31 +2,30 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0c0e1a">
     <title>Planning Famille — Saku-Aloïs</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- ====== ECRAN DE CONNEXION ====== -->
+    <!-- CONNEXION -->
     <div id="login-screen" class="login-screen">
         <div class="login-card">
             <div class="login-icon">👶</div>
             <h1>Planning Famille</h1>
             <p class="login-subtitle">Saku-Aloïs</p>
-            <div class="code-input-wrapper">
-                <input type="password" id="code-input" maxlength="20" placeholder="Entrez votre code"
-                       autocomplete="off">
-                <p id="code-error" class="code-error hidden">Code incorrect</p>
-            </div>
-            <button id="login-btn" class="btn btn-login">Entrer</button>
+            <input type="password" id="code-input" maxlength="20" placeholder="Entrez votre code" autocomplete="off">
+            <p id="code-error" class="code-error hidden">Code incorrect</p>
+            <button id="login-btn" class="btn-login">Entrer</button>
         </div>
     </div>
 
-    <!-- ====== APP PRINCIPALE ====== -->
+    <!-- APP -->
     <div id="app" class="hidden">
         <header>
             <div class="header-top">
@@ -39,42 +38,37 @@
                     <button id="logout-btn" class="btn-icon" title="Déconnexion">&#x2715;</button>
                 </div>
             </div>
-
             <nav class="week-nav">
-                <button id="prev-week" aria-label="Semaine précédente">&larr;</button>
+                <button id="prev-week">&larr;</button>
                 <span id="week-label"></span>
-                <button id="next-week" aria-label="Semaine suivante">&rarr;</button>
+                <button id="next-week">&rarr;</button>
                 <button id="today-btn" class="btn-today">Aujourd'hui</button>
             </nav>
-
             <div class="view-toggle">
-                <button class="view-btn active" data-view="week">Liste</button>
-                <button class="view-btn" data-view="grid">Calendrier</button>
+                <button class="view-btn" data-view="list">Semaine</button>
+                <button class="view-btn active" data-view="grid">Mois</button>
             </div>
-
             <div id="legend" class="legend">
                 <span class="legend-item"><span class="dot dot-papa"></span>Papa</span>
                 <span class="legend-item"><span class="dot dot-maman"></span>Maman</span>
                 <span class="legend-item"><span class="dot dot-nounou"></span>Nounou</span>
                 <span class="legend-item"><span class="dot dot-conge-commun"></span>Congé commun</span>
                 <span class="legend-item"><span class="dot dot-vacances"></span>Vacances</span>
-                <span class="legend-item"><span class="dot dot-ecole"></span>École</span>
             </div>
         </header>
 
         <main>
-            <div id="calendar" class="calendar"></div>
+            <div id="calendar"></div>
 
-            <!-- ====== RÉSUMÉ MENSUEL ====== -->
             <div id="monthly-summary" class="monthly-summary">
-                <h3 id="summary-title">Résumé du mois</h3>
+                <h3 id="summary-title">Résumé</h3>
                 <div class="summary-grid">
                     <div class="summary-card">
                         <span class="summary-label">Jours de garde</span>
                         <span id="summary-days" class="summary-value">—</span>
                     </div>
                     <div class="summary-card">
-                        <span class="summary-label">Estimation gains</span>
+                        <span class="summary-label">Estimation</span>
                         <span id="summary-cost" class="summary-value cost">—</span>
                     </div>
                     <div class="summary-card summary-card-wide">
@@ -84,14 +78,13 @@
                 </div>
             </div>
 
-            <!-- ====== CONGÉS COMMUNS (admin only) ====== -->
             <div id="conges-communs" class="conges-communs hidden">
-                <h3>Congés communs ce mois</h3>
+                <h3 id="conges-title">Congés communs</h3>
                 <div id="conges-list" class="conges-list"></div>
             </div>
         </main>
 
-        <!-- ====== MODAL AJOUT/MODIF ====== -->
+        <!-- MODAL -->
         <div id="modal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
@@ -100,9 +93,18 @@
                 </div>
                 <form id="event-form">
                     <div class="form-group">
-                        <label for="event-type">Type</label>
+                        <label for="event-gabriel">Gabriel ce jour</label>
+                        <select id="event-gabriel">
+                            <option value="auto">Automatique (planning SEMITAN)</option>
+                            <option value="travail">Travaille</option>
+                            <option value="repos">Ne travaille pas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-type">Action nounou</label>
                         <select id="event-type">
-                            <option value="nounou">Nounou garde</option>
+                            <option value="">— Aucune —</option>
+                            <option value="nounou">Forcer garde nounou</option>
                             <option value="annulation">Annulation garde</option>
                         </select>
                     </div>
