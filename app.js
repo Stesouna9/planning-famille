@@ -369,8 +369,8 @@ function getDayInfo(dateStr) {
     const statusLabels = {
         "both-work": "Les 2",
         "both-off": "Repos",
-        "papa-only": "Papa",
-        "maman-only": "Maman"
+        "papa-only": "Gabriel",
+        "maman-only": "Mieko"
     };
     return {
         status,
