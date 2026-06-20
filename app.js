@@ -134,10 +134,16 @@ function gabrielWorks(dateStr) {
     return status === "travail";
 }
 
+function isParentEnConge(qui, dateStr) {
+    if (!CONFIG.CONGES_PARENTS) return false;
+    return CONFIG.CONGES_PARENTS.some(c => c.qui === qui && dateStr >= c.debut && dateStr < c.fin);
+}
+
 function miekoWorks(dateStr) {
     const manual = manualEvents[dateStr];
     if (manual && manual.mieko === "travail") return true;
     if (manual && manual.mieko === "repos") return false;
+    if (isParentEnConge("mieko", dateStr)) return false;
     const ref = new Date("2026-04-02T00:00:00");
     const d = new Date(dateStr + "T00:00:00");
     const diff = Math.round((d - ref) / 86400000);
@@ -182,7 +188,12 @@ function getDayStatus(dateStr) {
     const gWork = gabrielWorks(dateStr);
     const mWork = miekoWorks(dateStr);
     if (gWork && mWork) return "both-work";
-    if (!gWork && !mWork) return "both-off";
+    if (!gWork && !mWork) {
+        const gConge = isParentEnConge("gabriel", dateStr);
+        const mConge = isParentEnConge("mieko", dateStr);
+        if (gConge && mConge) return "vacances-communes";
+        return "both-off";
+    }
     if (gWork && !mWork) return "papa-only";
     return "maman-only";
 }
@@ -372,6 +383,7 @@ function getDayInfo(dateStr) {
     const statusLabels = {
         "both-work": "Les 2",
         "both-off": "Repos",
+        "vacances-communes": "Vacances",
         "papa-only": "Gabriel",
         "maman-only": "Mieko"
     };
@@ -396,7 +408,7 @@ function calcStats(info, stats) {
         if (info.tarif === 40) stats.d40++; else stats.d70++;
     }
     if (info.annulation) stats.cost += CONFIG.TARIFS.annulation;
-    if (info.status === "both-off") {
+    if (info.status === "both-off" || info.status === "vacances-communes") {
         const d = new Date(info.dateStr + "T00:00:00");
         stats.conges.push(d);
     }

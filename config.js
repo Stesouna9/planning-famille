@@ -120,8 +120,8 @@ const CONFIG = {
         "2026-07-05": "repos", "2026-07-06": "repos",
         "2026-07-07": "travail", "2026-07-08": "travail",
         "2026-07-09": "travail", "2026-07-10": "travail",
-        "2026-07-11": "repos", "2026-07-12": "repos",
-        // Vacances été
+        // Vacances Gabriel : 11 juillet — 3 août
+        "2026-07-11": "repos_accepte", "2026-07-12": "repos_accepte",
         "2026-07-13": "repos_accepte", "2026-07-14": "repos_accepte",
         "2026-07-15": "repos_accepte", "2026-07-16": "repos_accepte",
         "2026-07-17": "repos_accepte", "2026-07-18": "repos_accepte",
@@ -132,5 +132,13 @@ const CONFIG = {
         "2026-07-27": "repos_accepte", "2026-07-28": "repos_accepte",
         "2026-07-29": "repos_accepte", "2026-07-30": "repos_accepte",
         "2026-07-31": "repos_accepte",
-    }
+        "2026-08-01": "repos_accepte", "2026-08-02": "repos_accepte",
+        "2026-08-03": "repos_accepte",
+    },
+
+    /* --- Congés parents (vacances déclarées) --- */
+    CONGES_PARENTS: [
+        { qui: "gabriel", debut: "2026-07-11", fin: "2026-08-04", nom: "Été" },
+        { qui: "mieko",   debut: "2026-07-11", fin: "2026-08-10", nom: "Japon" }
+    ]
 };

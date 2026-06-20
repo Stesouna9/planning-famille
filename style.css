@@ -19,6 +19,7 @@
     --c-ferie: #f472b6;
     --c-ecole: #64748b;
     --c-cancel: #ef4444;
+    --c-vac-communes: #eab308;
 }
 
 body {
@@ -173,6 +174,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 /* Cell backgrounds */
 .g-cell[data-status="both-work"] { background: linear-gradient(135deg, #450a0a, #7f1d1d); border-color: #991b1b; }
 .g-cell[data-status="both-off"]  { background: linear-gradient(135deg, #2e1030, #4a1a50); border-color: #7c3aed40; }
+.g-cell[data-status="vacances-communes"] { background: linear-gradient(135deg, #422006, #713f12); border-color: #eab30840; }
 .g-cell[data-status="papa-only"] { background: linear-gradient(135deg, #0c1d3a, #1e3a5f); border-color: #2563eb40; }
 .g-cell[data-status="maman-only"]{ background: linear-gradient(135deg, #052e1f, #0d4a35); border-color: #05966940; }
 
@@ -185,6 +187,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 }
 .g-label-both-work { color: #fca5a5; }
 .g-label-both-off  { color: #f0abfc; }
+.g-label-vacances-communes { color: #fde047; }
 .g-label-papa-only { color: #93c5fd; }
 .g-label-maman-only{ color: #6ee7b7; }
 
@@ -216,6 +219,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 
 .l-row[data-status="both-work"] { background: linear-gradient(90deg, #450a0a, #7f1d1d); border-color: #991b1b; }
 .l-row[data-status="both-off"]  { background: linear-gradient(90deg, #2e1030, #4a1a50); border-color: #7c3aed40; }
+.l-row[data-status="vacances-communes"] { background: linear-gradient(90deg, #422006, #713f12); border-color: #eab30840; }
 .l-row[data-status="papa-only"] { background: linear-gradient(90deg, #0c1d3a, #1e3a5f); border-color: #2563eb40; }
 .l-row[data-status="maman-only"]{ background: linear-gradient(90deg, #052e1f, #0d4a35); border-color: #05966940; }
 
@@ -233,6 +237,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 }
 .l-status-both-work { background: rgba(220,38,38,0.3); color: #fca5a5; }
 .l-status-both-off  { background: rgba(236,72,153,0.2); color: #f0abfc; }
+.l-status-vacances-communes { background: rgba(234,179,8,0.2); color: #fde047; }
 .l-status-papa-only { background: rgba(59,130,246,0.2); color: #93c5fd; }
 .l-status-maman-only{ background: rgba(16,185,129,0.2); color: #6ee7b7; }
 
