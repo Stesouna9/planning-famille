@@ -177,6 +177,8 @@ function nounouNeeded(dateStr) {
 }
 
 function nounouTarif(dateStr) {
+    const manual = manualEvents[dateStr];
+    if (manual && manual.tarif) return manual.tarif;
     const d = new Date(dateStr + "T00:00:00");
     const dow = d.getDay();
     if (isVacances(dateStr)) return CONFIG.TARIFS.jour_complet;
@@ -459,6 +461,9 @@ function bindModal() {
         e.preventDefault();
         saveManualEvent();
     });
+    document.getElementById("event-tarif").addEventListener("change", (e) => {
+        document.getElementById("event-tarif-custom").classList.toggle("hidden", e.target.value !== "custom");
+    });
     document.getElementById("btn-delete").addEventListener("click", () => {
         deleteManualEvent(document.getElementById("modal").dataset.date);
         closeModal();
@@ -476,6 +481,22 @@ function openModal(dateStr) {
     document.getElementById("event-gabriel").value = existing ? (existing.gabriel || "auto") : "auto";
     document.getElementById("event-mieko").value = existing ? (existing.mieko || "auto") : "auto";
     document.getElementById("event-type").value = existing ? (existing.type || "") : "";
+    const tarifSelect = document.getElementById("event-tarif");
+    const tarifCustom = document.getElementById("event-tarif-custom");
+    if (existing && existing.tarif) {
+        const val = String(existing.tarif);
+        if ([...tarifSelect.options].some(o => o.value === val)) {
+            tarifSelect.value = val;
+            tarifCustom.classList.add("hidden");
+        } else {
+            tarifSelect.value = "custom";
+            tarifCustom.value = existing.tarif;
+            tarifCustom.classList.remove("hidden");
+        }
+    } else {
+        tarifSelect.value = "auto";
+        tarifCustom.classList.add("hidden");
+    }
     document.getElementById("event-note").value = existing ? (existing.note || "") : "";
     document.getElementById("btn-delete").classList.toggle("hidden", !existing);
     modal.classList.remove("hidden");
@@ -488,12 +509,19 @@ function saveManualEvent() {
     const gabriel = document.getElementById("event-gabriel").value;
     const mieko = document.getElementById("event-mieko").value;
     const type = document.getElementById("event-type").value;
+    const tarifVal = document.getElementById("event-tarif").value;
+    const tarifCustom = document.getElementById("event-tarif-custom").value;
     const note = document.getElementById("event-note").value.trim();
 
     const data = {};
     if (gabriel !== "auto") data.gabriel = gabriel;
     if (mieko !== "auto") data.mieko = mieko;
     if (type) data.type = type;
+    if (tarifVal === "custom" && tarifCustom) {
+        data.tarif = Number(tarifCustom);
+    } else if (tarifVal !== "auto" && tarifVal !== "custom") {
+        data.tarif = Number(tarifVal);
+    }
     if (note) data.note = note;
 
     if (Object.keys(data).length > 0) {
