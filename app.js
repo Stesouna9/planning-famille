@@ -135,6 +135,9 @@ function gabrielWorks(dateStr) {
 }
 
 function miekoWorks(dateStr) {
+    const manual = manualEvents[dateStr];
+    if (manual && manual.mieko === "travail") return true;
+    if (manual && manual.mieko === "repos") return false;
     const ref = new Date("2026-04-02T00:00:00");
     const d = new Date(dateStr + "T00:00:00");
     const diff = Math.round((d - ref) / 86400000);
@@ -459,6 +462,7 @@ function openModal(dateStr) {
     modal.dataset.date = dateStr;
     const existing = manualEvents[dateStr];
     document.getElementById("event-gabriel").value = existing ? (existing.gabriel || "auto") : "auto";
+    document.getElementById("event-mieko").value = existing ? (existing.mieko || "auto") : "auto";
     document.getElementById("event-type").value = existing ? (existing.type || "") : "";
     document.getElementById("event-note").value = existing ? (existing.note || "") : "";
     document.getElementById("btn-delete").classList.toggle("hidden", !existing);
@@ -470,12 +474,13 @@ function closeModal() { document.getElementById("modal").classList.add("hidden")
 function saveManualEvent() {
     const dateStr = document.getElementById("modal").dataset.date;
     const gabriel = document.getElementById("event-gabriel").value;
+    const mieko = document.getElementById("event-mieko").value;
     const type = document.getElementById("event-type").value;
     const note = document.getElementById("event-note").value.trim();
 
-    // Only save if something changed
     const data = {};
     if (gabriel !== "auto") data.gabriel = gabriel;
+    if (mieko !== "auto") data.mieko = mieko;
     if (type) data.type = type;
     if (note) data.note = note;
 
