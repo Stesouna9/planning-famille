@@ -173,6 +173,9 @@ function hasSchool(dateStr) {
 }
 
 function nounouNeeded(dateStr) {
+    const d = new Date(dateStr + "T00:00:00");
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) return false;
     return gabrielWorks(dateStr) && miekoWorks(dateStr);
 }
 
