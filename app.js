@@ -175,8 +175,8 @@ function hasSchool(dateStr) {
 function nounouNeeded(dateStr) {
     const d = new Date(dateStr + "T00:00:00");
     const dow = d.getDay();
-    const isAout2026 = d.getFullYear() === 2026 && d.getMonth() === 7;
-    if (dow !== 0 && dow !== 6 && !isAout2026) return false;
+    const avantNouveauPlanning = dateStr < "2026-08-31";
+    if (dow !== 0 && dow !== 6 && !avantNouveauPlanning) return false;
     return gabrielWorks(dateStr) && miekoWorks(dateStr);
 }
 
