@@ -4,7 +4,7 @@
     {
       "name": "planning-famille",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "/Users/doclaundal/Desktop/planning-famille"],
+      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "/Users/doclaundal/planning-famille"],
       "port": 8090
     }
   ]

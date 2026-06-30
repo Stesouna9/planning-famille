@@ -192,7 +192,11 @@ function nounouTarif(dateStr) {
 function getDayStatus(dateStr) {
     const gWork = gabrielWorks(dateStr);
     const mWork = miekoWorks(dateStr);
-    if (gWork && mWork) return "both-work";
+    if (gWork && mWork) {
+        const d = new Date(dateStr + "T00:00:00");
+        const dow = d.getDay();
+        return (dow !== 0 && dow !== 6) ? "both-work-weekday" : "both-work";
+    }
     if (!gWork && !mWork) {
         const gConge = isParentEnConge("gabriel", dateStr);
         const mConge = isParentEnConge("mieko", dateStr);
@@ -281,7 +285,7 @@ function renderGrid() {
             html += `<div class="g-badge g-badge-cancel">Annulé</div>`;
         }
         if (info.vacances) {
-            html += `<div class="g-badge g-badge-vac">\u{1F3D6}</div>`;
+            html += `<div class="g-bar-vac">Vacances Saku</div>`;
         }
         if (info.ferie) {
             html += `<div class="g-badge g-badge-ferie">F</div>`;
@@ -387,6 +391,7 @@ function getDayInfo(dateStr) {
     const manual = manualEvents[dateStr] || null;
     const statusLabels = {
         "both-work": "Les 2",
+        "both-work-weekday": "Les 2",
         "both-off": "Repos",
         "vacances-communes": "Vacances",
         "papa-only": "Gabriel",

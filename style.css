@@ -136,6 +136,7 @@ header {
 .dot-papa { background: var(--c-papa); }
 .dot-maman { background: var(--c-maman); }
 .dot-nounou { background: var(--c-nounou); }
+.dot-both-weekday { background: #4a1c1c; border: 1px solid rgba(220,38,38,0.4); }
 .dot-conge-commun { background: var(--c-off); }
 .dot-vacances { background: var(--c-vac); }
 .dot-ecole { background: var(--c-ecole); }
@@ -173,6 +174,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 
 /* Cell backgrounds */
 .g-cell[data-status="both-work"] { background: linear-gradient(135deg, #450a0a, #7f1d1d); border-color: #991b1b; }
+.g-cell[data-status="both-work-weekday"] { background: linear-gradient(135deg, #3b1515, #4a1c1c); border-color: rgba(220,38,38,0.25); }
 .g-cell[data-status="both-off"]  { background: linear-gradient(135deg, #2e1030, #4a1a50); border-color: #7c3aed40; }
 .g-cell[data-status="vacances-communes"] { background: linear-gradient(135deg, #422006, #713f12); border-color: #eab30840; }
 .g-cell[data-status="papa-only"] { background: linear-gradient(135deg, #0c1d3a, #1e3a5f); border-color: #2563eb40; }
@@ -186,6 +188,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
     opacity: 0.8;
 }
 .g-label-both-work { color: #fca5a5; }
+.g-label-both-work-weekday { color: #f0a0a0; }
 .g-label-both-off  { color: #f0abfc; }
 .g-label-vacances-communes { color: #fde047; }
 .g-label-papa-only { color: #93c5fd; }
@@ -201,6 +204,14 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 .g-badge-vac { background: rgba(167,139,250,0.25); font-size: 0.65rem; }
 .g-badge-ferie { background: var(--c-ferie); color: white; }
 .g-badge-ecole { background: rgba(100,116,139,0.3); color: var(--text2); }
+
+.g-bar-vac {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(90deg, rgba(167,139,250,0.5), rgba(167,139,250,0.3));
+    color: #d8b4fe; font-size: 0.4rem; font-weight: 700;
+    text-align: center; padding: 1px 0; letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
 
 /* ====== LIST VIEW ====== */
 .cal-list {
@@ -218,6 +229,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 .l-today { box-shadow: inset 0 0 0 2px var(--accent); }
 
 .l-row[data-status="both-work"] { background: linear-gradient(90deg, #450a0a, #7f1d1d); border-color: #991b1b; }
+.l-row[data-status="both-work-weekday"] { background: linear-gradient(90deg, #3b1515, #4a1c1c); border-color: rgba(220,38,38,0.25); }
 .l-row[data-status="both-off"]  { background: linear-gradient(90deg, #2e1030, #4a1a50); border-color: #7c3aed40; }
 .l-row[data-status="vacances-communes"] { background: linear-gradient(90deg, #422006, #713f12); border-color: #eab30840; }
 .l-row[data-status="papa-only"] { background: linear-gradient(90deg, #0c1d3a, #1e3a5f); border-color: #2563eb40; }
@@ -236,6 +248,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
     border-radius: 4px;
 }
 .l-status-both-work { background: rgba(220,38,38,0.3); color: #fca5a5; }
+.l-status-both-work-weekday { background: rgba(220,38,38,0.15); color: #f0a0a0; }
 .l-status-both-off  { background: rgba(236,72,153,0.2); color: #f0abfc; }
 .l-status-vacances-communes { background: rgba(234,179,8,0.2); color: #fde047; }
 .l-status-papa-only { background: rgba(59,130,246,0.2); color: #93c5fd; }
@@ -328,6 +341,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
     .g-num { font-size: 0.9rem; }
     .g-label { font-size: 0.45rem; }
     .g-badge { font-size: 0.4rem; padding: 1px 3px; }
+    .g-bar-vac { font-size: 0.35rem; }
     .g-header { font-size: 0.5rem; padding: 0.3rem 0; }
 
     .l-row { padding: 0.5rem 0.6rem; border-radius: 8px; }
