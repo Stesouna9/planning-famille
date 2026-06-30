@@ -22,8 +22,8 @@ const CONFIG = {
 
     /* --- Horaires parents --- */
     HORAIRES: {
-        gabriel_semaine: "14h-15h",
-        gabriel_weekend: "~16h",
+        gabriel: "6h — 15h",
+        emmanuel_weekend: "10h — 16h",
         mieko: "11h — 23h"
     },
 
@@ -33,17 +33,25 @@ const CONFIG = {
         // mod 4 : 0,1 = repos / 2,3 = travail
     },
 
-    /* --- Vacances scolaires Zone B 2025-2026 --- */
+    /* --- Vacances scolaires Zone B --- */
     VACANCES: [
+        // 2025-2026
         { debut: "2025-10-18", fin: "2025-11-03", nom: "Toussaint" },
         { debut: "2025-12-20", fin: "2026-01-05", nom: "Noël" },
         { debut: "2026-02-14", fin: "2026-03-02", nom: "Hiver" },
         { debut: "2026-04-11", fin: "2026-04-27", nom: "Printemps" },
-        { debut: "2026-07-04", fin: "2026-09-01", nom: "Été" }
+        { debut: "2026-07-04", fin: "2026-09-01", nom: "Été" },
+        // 2026-2027 (Zone B — dates à confirmer)
+        { debut: "2026-10-17", fin: "2026-11-02", nom: "Toussaint" },
+        { debut: "2026-12-19", fin: "2027-01-04", nom: "Noël" },
+        { debut: "2027-02-20", fin: "2027-03-08", nom: "Hiver" },
+        { debut: "2027-04-17", fin: "2027-05-03", nom: "Printemps" },
+        { debut: "2027-07-03", fin: "2027-09-01", nom: "Été" }
     ],
 
-    /* --- Jours fériés 2026 --- */
+    /* --- Jours fériés --- */
     JOURS_FERIES: [
+        // 2026
         "2026-01-01", // Jour de l'An
         "2026-04-06", // Lundi de Pâques
         "2026-05-01", // Fête du Travail
@@ -56,6 +64,18 @@ const CONFIG = {
         "2026-11-01", // Toussaint
         "2026-11-11", // Armistice
         "2026-12-25", // Noël
+        // 2027
+        "2027-01-01", // Jour de l'An
+        "2027-03-29", // Lundi de Pâques
+        "2027-05-01", // Fête du Travail
+        "2027-05-06", // Ascension
+        "2027-05-08", // Victoire 1945
+        "2027-05-17", // Lundi de Pentecôte
+        "2027-07-14", // Fête nationale
+        "2027-08-15", // Assomption
+        "2027-11-01", // Toussaint
+        "2027-11-11", // Armistice
+        "2027-12-25", // Noël
     ],
 
     /* --- Planning Gabriel (SEMITAN) ---
@@ -150,6 +170,148 @@ const CONFIG = {
         "2026-08-26": "travail", "2026-08-27": "travail",
         "2026-08-28": "travail", "2026-08-29": "travail",
         "2026-08-30": "repos",
+        // === Roulement 11TS Position 02 (grille 10TS) ===
+        // Août 2026 (fin)
+        "2026-08-31": "travail",
+        // Septembre 2026
+        "2026-09-01": "repos", "2026-09-02": "travail", "2026-09-03": "travail",
+        "2026-09-04": "travail", "2026-09-05": "travail", "2026-09-06": "repos",
+        "2026-09-07": "repos", "2026-09-08": "travail", "2026-09-09": "travail",
+        "2026-09-10": "travail", "2026-09-11": "travail", "2026-09-12": "travail",
+        "2026-09-13": "repos", "2026-09-14": "travail", "2026-09-15": "travail",
+        "2026-09-16": "repos", "2026-09-17": "travail", "2026-09-18": "repos",
+        "2026-09-19": "travail", "2026-09-20": "repos", "2026-09-21": "repos",
+        "2026-09-22": "travail", "2026-09-23": "travail", "2026-09-24": "travail",
+        "2026-09-25": "travail", "2026-09-26": "repos", "2026-09-27": "repos",
+        "2026-09-28": "travail", "2026-09-29": "travail", "2026-09-30": "travail",
+        // Octobre 2026
+        "2026-10-01": "repos", "2026-10-02": "travail", "2026-10-03": "repos",
+        "2026-10-04": "repos", "2026-10-05": "travail", "2026-10-06": "repos",
+        "2026-10-07": "travail", "2026-10-08": "travail", "2026-10-09": "travail",
+        "2026-10-10": "travail", "2026-10-11": "repos", "2026-10-12": "repos",
+        "2026-10-13": "travail", "2026-10-14": "travail", "2026-10-15": "travail",
+        "2026-10-16": "travail", "2026-10-17": "travail", "2026-10-18": "repos",
+        "2026-10-19": "travail", "2026-10-20": "travail", "2026-10-21": "repos",
+        "2026-10-22": "travail", "2026-10-23": "repos", "2026-10-24": "travail",
+        "2026-10-25": "repos", "2026-10-26": "repos", "2026-10-27": "travail",
+        "2026-10-28": "travail", "2026-10-29": "travail", "2026-10-30": "travail",
+        "2026-10-31": "repos",
+        // Novembre 2026
+        "2026-11-01": "repos", "2026-11-02": "travail", "2026-11-03": "travail",
+        "2026-11-04": "travail", "2026-11-05": "repos", "2026-11-06": "travail",
+        "2026-11-07": "repos", "2026-11-08": "repos", "2026-11-09": "travail",
+        "2026-11-10": "repos", "2026-11-11": "travail", "2026-11-12": "travail",
+        "2026-11-13": "travail", "2026-11-14": "travail", "2026-11-15": "repos",
+        "2026-11-16": "repos", "2026-11-17": "travail", "2026-11-18": "travail",
+        "2026-11-19": "travail", "2026-11-20": "travail", "2026-11-21": "travail",
+        "2026-11-22": "repos", "2026-11-23": "travail", "2026-11-24": "travail",
+        "2026-11-25": "repos", "2026-11-26": "travail", "2026-11-27": "repos",
+        "2026-11-28": "travail", "2026-11-29": "repos", "2026-11-30": "repos",
+        // Décembre 2026
+        "2026-12-01": "travail", "2026-12-02": "travail", "2026-12-03": "travail",
+        "2026-12-04": "travail", "2026-12-05": "repos", "2026-12-06": "repos",
+        "2026-12-07": "travail", "2026-12-08": "travail", "2026-12-09": "travail",
+        "2026-12-10": "repos", "2026-12-11": "travail", "2026-12-12": "repos",
+        "2026-12-13": "repos", "2026-12-14": "travail", "2026-12-15": "repos",
+        "2026-12-16": "travail", "2026-12-17": "travail", "2026-12-18": "travail",
+        "2026-12-19": "travail", "2026-12-20": "repos", "2026-12-21": "repos",
+        "2026-12-22": "travail", "2026-12-23": "travail", "2026-12-24": "travail",
+        "2026-12-25": "travail", "2026-12-26": "travail", "2026-12-27": "repos",
+        "2026-12-28": "travail", "2026-12-29": "travail", "2026-12-30": "repos",
+        "2026-12-31": "travail",
+        // Janvier 2027
+        "2027-01-01": "repos", "2027-01-02": "travail", "2027-01-03": "repos",
+        "2027-01-04": "repos", "2027-01-05": "travail", "2027-01-06": "travail",
+        "2027-01-07": "travail", "2027-01-08": "travail", "2027-01-09": "repos",
+        "2027-01-10": "repos", "2027-01-11": "travail", "2027-01-12": "travail",
+        "2027-01-13": "travail", "2027-01-14": "repos", "2027-01-15": "travail",
+        "2027-01-16": "repos", "2027-01-17": "repos", "2027-01-18": "travail",
+        "2027-01-19": "repos", "2027-01-20": "travail", "2027-01-21": "travail",
+        "2027-01-22": "travail", "2027-01-23": "travail", "2027-01-24": "repos",
+        "2027-01-25": "repos", "2027-01-26": "travail", "2027-01-27": "travail",
+        "2027-01-28": "travail", "2027-01-29": "travail", "2027-01-30": "travail",
+        "2027-01-31": "repos",
+        // Février 2027
+        "2027-02-01": "travail", "2027-02-02": "travail", "2027-02-03": "repos",
+        "2027-02-04": "travail", "2027-02-05": "repos", "2027-02-06": "travail",
+        "2027-02-07": "repos", "2027-02-08": "repos", "2027-02-09": "travail",
+        "2027-02-10": "travail", "2027-02-11": "travail", "2027-02-12": "travail",
+        "2027-02-13": "repos", "2027-02-14": "repos", "2027-02-15": "travail",
+        "2027-02-16": "travail", "2027-02-17": "travail", "2027-02-18": "repos",
+        "2027-02-19": "travail", "2027-02-20": "repos", "2027-02-21": "repos",
+        "2027-02-22": "travail", "2027-02-23": "repos", "2027-02-24": "travail",
+        "2027-02-25": "travail", "2027-02-26": "travail", "2027-02-27": "travail",
+        "2027-02-28": "repos",
+        // Mars 2027
+        "2027-03-01": "repos", "2027-03-02": "travail", "2027-03-03": "travail",
+        "2027-03-04": "travail", "2027-03-05": "travail", "2027-03-06": "travail",
+        "2027-03-07": "repos", "2027-03-08": "travail", "2027-03-09": "travail",
+        "2027-03-10": "repos", "2027-03-11": "travail", "2027-03-12": "repos",
+        "2027-03-13": "travail", "2027-03-14": "repos", "2027-03-15": "repos",
+        "2027-03-16": "travail", "2027-03-17": "travail", "2027-03-18": "travail",
+        "2027-03-19": "travail", "2027-03-20": "repos", "2027-03-21": "repos",
+        "2027-03-22": "travail", "2027-03-23": "travail", "2027-03-24": "travail",
+        "2027-03-25": "repos", "2027-03-26": "travail", "2027-03-27": "repos",
+        "2027-03-28": "repos", "2027-03-29": "travail", "2027-03-30": "repos",
+        "2027-03-31": "travail",
+        // Avril 2027
+        "2027-04-01": "travail", "2027-04-02": "travail", "2027-04-03": "travail",
+        "2027-04-04": "repos", "2027-04-05": "repos", "2027-04-06": "travail",
+        "2027-04-07": "travail", "2027-04-08": "travail", "2027-04-09": "travail",
+        "2027-04-10": "travail", "2027-04-11": "repos", "2027-04-12": "travail",
+        "2027-04-13": "travail", "2027-04-14": "repos", "2027-04-15": "travail",
+        "2027-04-16": "repos", "2027-04-17": "travail", "2027-04-18": "repos",
+        "2027-04-19": "repos", "2027-04-20": "travail", "2027-04-21": "travail",
+        "2027-04-22": "travail", "2027-04-23": "travail", "2027-04-24": "repos",
+        "2027-04-25": "repos", "2027-04-26": "travail", "2027-04-27": "travail",
+        "2027-04-28": "travail", "2027-04-29": "repos", "2027-04-30": "travail",
+        // Mai 2027
+        "2027-05-01": "repos", "2027-05-02": "repos", "2027-05-03": "travail",
+        "2027-05-04": "repos", "2027-05-05": "travail", "2027-05-06": "travail",
+        "2027-05-07": "travail", "2027-05-08": "travail", "2027-05-09": "repos",
+        "2027-05-10": "repos", "2027-05-11": "travail", "2027-05-12": "travail",
+        "2027-05-13": "travail", "2027-05-14": "travail", "2027-05-15": "travail",
+        "2027-05-16": "repos", "2027-05-17": "travail", "2027-05-18": "travail",
+        "2027-05-19": "repos", "2027-05-20": "travail", "2027-05-21": "repos",
+        "2027-05-22": "travail", "2027-05-23": "repos", "2027-05-24": "repos",
+        "2027-05-25": "travail", "2027-05-26": "travail", "2027-05-27": "travail",
+        "2027-05-28": "travail", "2027-05-29": "repos", "2027-05-30": "repos",
+        "2027-05-31": "travail",
+        // Juin 2027
+        "2027-06-01": "travail", "2027-06-02": "travail", "2027-06-03": "repos",
+        "2027-06-04": "travail", "2027-06-05": "repos", "2027-06-06": "repos",
+        "2027-06-07": "travail", "2027-06-08": "repos", "2027-06-09": "travail",
+        "2027-06-10": "travail", "2027-06-11": "travail", "2027-06-12": "travail",
+        "2027-06-13": "repos", "2027-06-14": "repos", "2027-06-15": "travail",
+        "2027-06-16": "travail", "2027-06-17": "travail", "2027-06-18": "travail",
+        "2027-06-19": "travail", "2027-06-20": "repos", "2027-06-21": "travail",
+        "2027-06-22": "travail", "2027-06-23": "repos", "2027-06-24": "travail",
+        "2027-06-25": "repos", "2027-06-26": "travail", "2027-06-27": "repos",
+        "2027-06-28": "repos", "2027-06-29": "travail", "2027-06-30": "travail",
+        // Juillet 2027
+        "2027-07-01": "travail", "2027-07-02": "travail", "2027-07-03": "repos",
+        "2027-07-04": "repos", "2027-07-05": "travail", "2027-07-06": "travail",
+        "2027-07-07": "travail", "2027-07-08": "repos", "2027-07-09": "travail",
+        "2027-07-10": "repos", "2027-07-11": "repos", "2027-07-12": "travail",
+        "2027-07-13": "repos", "2027-07-14": "travail", "2027-07-15": "travail",
+        "2027-07-16": "travail", "2027-07-17": "travail", "2027-07-18": "repos",
+        "2027-07-19": "repos", "2027-07-20": "travail", "2027-07-21": "travail",
+        "2027-07-22": "travail", "2027-07-23": "travail", "2027-07-24": "travail",
+        "2027-07-25": "repos", "2027-07-26": "travail", "2027-07-27": "travail",
+        "2027-07-28": "repos", "2027-07-29": "travail", "2027-07-30": "repos",
+        "2027-07-31": "travail",
+        // Août 2027
+        "2027-08-01": "repos", "2027-08-02": "repos", "2027-08-03": "travail",
+        "2027-08-04": "travail", "2027-08-05": "travail", "2027-08-06": "travail",
+        "2027-08-07": "repos", "2027-08-08": "repos", "2027-08-09": "travail",
+        "2027-08-10": "travail", "2027-08-11": "travail", "2027-08-12": "repos",
+        "2027-08-13": "travail", "2027-08-14": "repos", "2027-08-15": "repos",
+        "2027-08-16": "travail", "2027-08-17": "repos", "2027-08-18": "travail",
+        "2027-08-19": "travail", "2027-08-20": "travail", "2027-08-21": "travail",
+        "2027-08-22": "repos", "2027-08-23": "repos", "2027-08-24": "travail",
+        "2027-08-25": "travail", "2027-08-26": "travail", "2027-08-27": "travail",
+        "2027-08-28": "travail", "2027-08-29": "repos", "2027-08-30": "travail",
+        "2027-08-31": "travail",
     },
 
     /* --- Congés parents (vacances déclarées) --- */
