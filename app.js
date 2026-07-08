@@ -294,6 +294,12 @@ function renderGrid() {
         if (info.school === "matin") {
             html += `<div class="g-badge g-badge-ecole">AM</div>`;
         }
+        if (info.periscolaire) {
+            html += `<div class="g-badge g-badge-peri">Péri.</div>`;
+        }
+        if (info.activiteVacances) {
+            html += `<div class="g-badge g-badge-actvac">Act. vac.</div>`;
+        }
 
         cell.innerHTML = html;
         cal.appendChild(cell);
@@ -373,6 +379,12 @@ function renderList() {
         if (info.ferie) {
             html += `<span class="l-tag l-tag-ferie">Férié</span>`;
         }
+        if (info.periscolaire) {
+            html += `<span class="l-tag l-tag-peri">Périscolaire</span>`;
+        }
+        if (info.activiteVacances) {
+            html += `<span class="l-tag l-tag-actvac">Act. vacances</span>`;
+        }
         if (info.note) {
             html += `<span class="l-note">${info.note}</span>`;
         }
@@ -398,16 +410,22 @@ function getDayInfo(dateStr) {
         "papa-only": "Gabriel",
         "maman-only": "Mieko"
     };
+    const d = new Date(dateStr + "T00:00:00");
+    const dow = d.getDay();
+    const bothWork = status === "both-work" || status === "both-work-weekday";
+    const vac = isVacances(dateStr);
     return {
         status,
         statusLabel: statusLabels[status],
         nounou: nounouNeeded(dateStr),
         tarif: nounouTarif(dateStr),
         school: hasSchool(dateStr),
-        vacances: isVacances(dateStr),
+        vacances: vac,
         ferie: isFerie(dateStr),
         annulation: manual && manual.type === "annulation",
         note: manual ? manual.note : null,
+        periscolaire: dow === 3 && bothWork && !vac,
+        activiteVacances: vac && bothWork,
         dateStr
     };
 }
