@@ -205,7 +205,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 .g-badge-ferie { background: var(--c-ferie); color: white; }
 .g-badge-ecole { background: rgba(100,116,139,0.3); color: var(--text2); }
 .g-badge-peri { background: rgba(250,204,21,0.3); color: #fde047; }
-.g-badge-actvac { background: rgba(34,197,94,0.3); color: #86efac; }
+.g-badge-actvac { background: rgba(250,204,21,0.3); color: #fde047; }
 
 .g-bar-vac {
     position: absolute; bottom: 0; left: 0; right: 0;
@@ -267,7 +267,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 .l-tag-vac { background: rgba(167,139,250,0.2); color: var(--c-vac); }
 .l-tag-ferie { background: var(--c-ferie); color: white; }
 .l-tag-peri { background: rgba(250,204,21,0.25); color: #fde047; border: 1px solid rgba(250,204,21,0.4); }
-.l-tag-actvac { background: rgba(34,197,94,0.25); color: #86efac; border: 1px solid rgba(34,197,94,0.4); }
+.l-tag-actvac { background: rgba(250,204,21,0.25); color: #fde047; border: 1px solid rgba(250,204,21,0.4); }
 .l-note { font-size: 0.6rem; color: var(--text2); font-style: italic; }
 
 /* ====== SUMMARY ====== */
