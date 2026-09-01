@@ -384,9 +384,13 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
         margin: 8mm;
     }
 
+    * { box-sizing: border-box !important; }
+
     html, body {
-        width: 100% !important;
-        height: 100% !important;
+        width: 281mm !important;
+        height: 194mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
         overflow: hidden !important;
         background: white !important;
         color: #1a1a1a !important;
@@ -399,25 +403,33 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
     #logout-btn, .monthly-summary, .conges-communs,
     .header-right, .cal-list { display: none !important; }
 
-    #app { display: flex !important; flex-direction: column !important; height: 100vh !important; }
+    #app {
+        display: block !important;
+        width: 281mm !important;
+        height: 194mm !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 
     header {
         position: static !important;
         background: white !important;
         border-bottom: 1px solid #999 !important;
-        padding: 2mm 0 1mm !important;
-        flex-shrink: 0 !important;
+        padding: 1mm 0 !important;
+        height: 18mm !important;
+        overflow: hidden !important;
     }
 
-    .header-top { margin-bottom: 1mm !important; }
-    .header-left h1 { color: #1a1a1a !important; font-size: 12pt !important; }
+    .header-top { margin-bottom: 0.5mm !important; }
+    .header-left h1 { color: #1a1a1a !important; font-size: 11pt !important; margin: 0 !important; }
     .subtitle { color: #666 !important; font-size: 7pt !important; }
     .user-badge { display: none !important; }
 
-    #week-label { color: #1a1a1a !important; font-size: 12pt !important; }
+    #week-label { color: #1a1a1a !important; font-size: 11pt !important; }
     .week-nav {
         justify-content: left !important;
-        margin-bottom: 1mm !important;
+        margin-bottom: 0 !important;
     }
     .week-nav button { display: none !important; }
 
@@ -426,23 +438,25 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 
     main {
         padding: 0 !important;
+        margin: 0 !important;
         max-width: none !important;
-        flex: 1 !important;
+        height: 176mm !important;
         overflow: hidden !important;
     }
 
     .cal-grid {
         gap: 1px !important;
-        width: 100% !important;
-        height: 100% !important;
-        grid-template-rows: auto repeat(6, 1fr) !important;
+        width: 281mm !important;
+        height: 176mm !important;
+        grid-template-rows: 5mm repeat(6, 1fr) !important;
     }
 
     .g-header {
         color: #333 !important;
         font-size: 6pt !important;
         font-weight: 800 !important;
-        padding: 0.5mm 0 !important;
+        padding: 0 !important;
+        line-height: 5mm !important;
     }
 
     .g-cell {
@@ -450,7 +464,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
         height: auto !important;
         border: 1px solid #bbb !important;
         border-radius: 1px !important;
-        padding: 0.8mm !important;
+        padding: 0.5mm !important;
         overflow: hidden !important;
     }
 
