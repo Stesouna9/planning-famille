@@ -204,7 +204,8 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 .g-badge-vac { background: rgba(167,139,250,0.25); font-size: 0.65rem; }
 .g-badge-ferie { background: var(--c-ferie); color: white; }
 .g-badge-ecole { background: rgba(100,116,139,0.3); color: var(--text2); }
-.g-badge-peri { background: rgba(250,204,21,0.3); color: #fde047; }
+.g-badge-cantine { background: rgba(251,146,60,0.3); font-size: 0.6rem; }
+.g-badge-peri { background: rgba(250,204,21,0.3); color: #fde047; font-size: 0.6rem; }
 .g-badge-actvac { background: rgba(250,204,21,0.3); color: #fde047; }
 
 .g-bar-vac {
@@ -266,6 +267,7 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 .l-tag-ecole { background: rgba(100,116,139,0.2); color: var(--text2); }
 .l-tag-vac { background: rgba(167,139,250,0.2); color: var(--c-vac); }
 .l-tag-ferie { background: var(--c-ferie); color: white; }
+.l-tag-cantine { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.4); }
 .l-tag-peri { background: rgba(250,204,21,0.25); color: #fde047; border: 1px solid rgba(250,204,21,0.4); }
 .l-tag-actvac { background: rgba(250,204,21,0.25); color: #fde047; border: 1px solid rgba(250,204,21,0.4); }
 .l-note { font-size: 0.6rem; color: var(--text2); font-style: italic; }
@@ -364,4 +366,116 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
     .g-label { display: none; }
     .g-badge { font-size: 0.35rem; padding: 0 2px; }
     .legend { display: none; }
+}
+
+/* ====== BOUTON IMPRIMER ====== */
+.btn-print {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.35rem 0.6rem;
+    cursor: pointer; font-size: 0.85rem; color: var(--text);
+    line-height: 1;
+}
+.btn-print:active { background: var(--accent); }
+
+/* ====== IMPRESSION A4 PAYSAGE ====== */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    body {
+        background: white !important;
+        color: #1a1a1a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    #login-screen, .modal, .btn-print, .btn-icon,
+    .view-toggle, .btn-today, #prev-week, #next-week,
+    #logout-btn, .monthly-summary, .conges-communs { display: none !important; }
+
+    header {
+        position: static !important;
+        background: white !important;
+        border-bottom: 2px solid #333 !important;
+        padding: 4mm 0 2mm !important;
+    }
+
+    .header-top { margin-bottom: 2mm !important; }
+    .header-left h1 { color: #1a1a1a !important; font-size: 14pt !important; }
+    .subtitle { color: #666 !important; }
+    .user-badge { display: none !important; }
+
+    #week-label {
+        color: #1a1a1a !important;
+        font-size: 13pt !important;
+    }
+
+    .week-nav { justify-content: left !important; margin-bottom: 2mm !important; }
+
+    .legend {
+        display: flex !important;
+        gap: 3mm !important;
+    }
+    .legend-item { color: #333 !important; font-size: 7pt !important; }
+
+    main { padding: 0 !important; max-width: none !important; }
+
+    .cal-grid {
+        gap: 1px !important;
+        width: 100% !important;
+    }
+
+    .g-header {
+        color: #333 !important;
+        font-size: 7pt !important;
+        padding: 1mm 0 !important;
+    }
+
+    .g-cell {
+        min-height: 18mm !important;
+        border: 1px solid #ccc !important;
+        border-radius: 2px !important;
+        padding: 1mm !important;
+        page-break-inside: avoid;
+    }
+
+    .g-dim { opacity: 0.3 !important; }
+    .g-inactive { opacity: 0.15 !important; }
+    .g-today { box-shadow: inset 0 0 0 2px #333 !important; }
+
+    .g-cell[data-status="both-work"] { background: #fecaca !important; border-color: #f87171 !important; }
+    .g-cell[data-status="both-work-weekday"] { background: #fee2e2 !important; border-color: #fca5a5 !important; }
+    .g-cell[data-status="both-off"] { background: #f5f3ff !important; border-color: #c4b5fd !important; }
+    .g-cell[data-status="vacances-communes"] { background: #fef9c3 !important; border-color: #fde047 !important; }
+    .g-cell[data-status="papa-only"] { background: #dbeafe !important; border-color: #93c5fd !important; }
+    .g-cell[data-status="maman-only"] { background: #d1fae5 !important; border-color: #6ee7b7 !important; }
+
+    .g-num { font-size: 10pt !important; color: #1a1a1a !important; }
+    .g-label { font-size: 6pt !important; color: #555 !important; }
+    .g-label-both-work, .g-label-both-work-weekday { color: #dc2626 !important; }
+    .g-label-papa-only { color: #2563eb !important; }
+    .g-label-maman-only { color: #059669 !important; }
+    .g-label-both-off { color: #7c3aed !important; }
+    .g-label-vacances-communes { color: #ca8a04 !important; }
+
+    .g-badge { font-size: 5pt !important; }
+    .g-badge-nounou { background: #f59e0b !important; color: #1c1300 !important; }
+    .g-badge-cantine { background: rgba(251,146,60,0.3) !important; }
+    .g-badge-peri { background: rgba(250,204,21,0.4) !important; }
+
+    .g-bar-vac {
+        background: rgba(167,139,250,0.3) !important;
+        color: #6d28d9 !important;
+        font-size: 5pt !important;
+    }
+
+    .dot { border: 1px solid #999 !important; }
+    .dot-papa { background: #3b82f6 !important; }
+    .dot-maman { background: #10b981 !important; }
+    .dot-nounou { background: #f59e0b !important; }
+    .dot-both-weekday { background: #fee2e2 !important; }
+    .dot-conge-commun { background: #ec4899 !important; }
+    .dot-vacances { background: #a78bfa !important; }
 }

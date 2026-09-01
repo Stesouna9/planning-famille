@@ -294,8 +294,11 @@ function renderGrid() {
         if (info.school === "matin") {
             html += `<div class="g-badge g-badge-ecole">AM</div>`;
         }
+        if (info.cantine) {
+            html += `<div class="g-badge g-badge-cantine">\u{1F37D}</div>`;
+        }
         if (info.periscolaire) {
-            html += `<div class="g-badge g-badge-peri">Péri.</div>`;
+            html += `<div class="g-badge g-badge-peri">⚽</div>`;
         }
         if (info.activiteVacances) {
             html += `<div class="g-badge g-badge-actvac">Act. vac.</div>`;
@@ -379,8 +382,11 @@ function renderList() {
         if (info.ferie) {
             html += `<span class="l-tag l-tag-ferie">Férié</span>`;
         }
+        if (info.cantine) {
+            html += `<span class="l-tag l-tag-cantine">\u{1F37D} Cantine</span>`;
+        }
         if (info.periscolaire) {
-            html += `<span class="l-tag l-tag-peri">Périscolaire</span>`;
+            html += `<span class="l-tag l-tag-peri">⚽ Périscolaire</span>`;
         }
         if (info.activiteVacances) {
             html += `<span class="l-tag l-tag-actvac">Act. vacances</span>`;
@@ -426,6 +432,7 @@ function getDayInfo(dateStr) {
         note: manual ? manual.note : null,
         periscolaire: dow === 3 && bothWork && !vac,
         activiteVacances: vac && bothWork,
+        cantine: bothWork && !vac && !isFerie(dateStr) && dow >= 1 && dow <= 5,
         dateStr
     };
 }
