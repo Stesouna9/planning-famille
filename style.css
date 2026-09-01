@@ -380,11 +380,14 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 /* ====== IMPRESSION A4 PAYSAGE ====== */
 @media print {
     @page {
-        size: A4 landscape;
-        margin: 10mm;
+        size: landscape;
+        margin: 8mm;
     }
 
-    body {
+    html, body {
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
         background: white !important;
         color: #1a1a1a !important;
         -webkit-print-color-adjust: exact;
@@ -393,57 +396,67 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
 
     #login-screen, .modal, .btn-print, .btn-icon,
     .view-toggle, .btn-today, #prev-week, #next-week,
-    #logout-btn, .monthly-summary, .conges-communs { display: none !important; }
+    #logout-btn, .monthly-summary, .conges-communs,
+    .header-right, .cal-list { display: none !important; }
+
+    #app { display: flex !important; flex-direction: column !important; height: 100vh !important; }
 
     header {
         position: static !important;
         background: white !important;
-        border-bottom: 2px solid #333 !important;
-        padding: 4mm 0 2mm !important;
+        border-bottom: 1px solid #999 !important;
+        padding: 2mm 0 1mm !important;
+        flex-shrink: 0 !important;
     }
 
-    .header-top { margin-bottom: 2mm !important; }
-    .header-left h1 { color: #1a1a1a !important; font-size: 14pt !important; }
-    .subtitle { color: #666 !important; }
+    .header-top { margin-bottom: 1mm !important; }
+    .header-left h1 { color: #1a1a1a !important; font-size: 12pt !important; }
+    .subtitle { color: #666 !important; font-size: 7pt !important; }
     .user-badge { display: none !important; }
 
-    #week-label {
-        color: #1a1a1a !important;
-        font-size: 13pt !important;
+    #week-label { color: #1a1a1a !important; font-size: 12pt !important; }
+    .week-nav {
+        justify-content: left !important;
+        margin-bottom: 1mm !important;
     }
+    .week-nav button { display: none !important; }
 
-    .week-nav { justify-content: left !important; margin-bottom: 2mm !important; }
+    .legend { display: flex !important; gap: 3mm !important; }
+    .legend-item { color: #333 !important; font-size: 6pt !important; }
 
-    .legend {
-        display: flex !important;
-        gap: 3mm !important;
+    main {
+        padding: 0 !important;
+        max-width: none !important;
+        flex: 1 !important;
+        overflow: hidden !important;
     }
-    .legend-item { color: #333 !important; font-size: 7pt !important; }
-
-    main { padding: 0 !important; max-width: none !important; }
 
     .cal-grid {
         gap: 1px !important;
         width: 100% !important;
+        height: 100% !important;
+        grid-template-rows: auto repeat(6, 1fr) !important;
     }
 
     .g-header {
         color: #333 !important;
-        font-size: 7pt !important;
-        padding: 1mm 0 !important;
+        font-size: 6pt !important;
+        font-weight: 800 !important;
+        padding: 0.5mm 0 !important;
     }
 
     .g-cell {
-        min-height: 18mm !important;
-        border: 1px solid #ccc !important;
-        border-radius: 2px !important;
-        padding: 1mm !important;
-        page-break-inside: avoid;
+        min-height: 0 !important;
+        height: auto !important;
+        border: 1px solid #bbb !important;
+        border-radius: 1px !important;
+        padding: 0.8mm !important;
+        overflow: hidden !important;
     }
 
-    .g-dim { opacity: 0.3 !important; }
+    .g-dim { opacity: 0.25 !important; }
     .g-inactive { opacity: 0.15 !important; }
-    .g-today { box-shadow: inset 0 0 0 2px #333 !important; }
+    .g-today { box-shadow: inset 0 0 0 1.5px #333 !important; }
 
     .g-cell[data-status="both-work"] { background: #fecaca !important; border-color: #f87171 !important; }
     .g-cell[data-status="both-work-weekday"] { background: #fee2e2 !important; border-color: #fca5a5 !important; }
@@ -452,23 +465,25 @@ main { padding: 0.5rem; max-width: 960px; margin: 0 auto; }
     .g-cell[data-status="papa-only"] { background: #dbeafe !important; border-color: #93c5fd !important; }
     .g-cell[data-status="maman-only"] { background: #d1fae5 !important; border-color: #6ee7b7 !important; }
 
-    .g-num { font-size: 10pt !important; color: #1a1a1a !important; }
-    .g-label { font-size: 6pt !important; color: #555 !important; }
+    .g-num { font-size: 9pt !important; color: #1a1a1a !important; font-weight: 800 !important; }
+    .g-label { font-size: 5.5pt !important; color: #555 !important; }
     .g-label-both-work, .g-label-both-work-weekday { color: #dc2626 !important; }
     .g-label-papa-only { color: #2563eb !important; }
     .g-label-maman-only { color: #059669 !important; }
     .g-label-both-off { color: #7c3aed !important; }
     .g-label-vacances-communes { color: #ca8a04 !important; }
 
-    .g-badge { font-size: 5pt !important; }
+    .g-badge { font-size: 5pt !important; padding: 0 2px !important; margin-top: 0 !important; }
     .g-badge-nounou { background: #f59e0b !important; color: #1c1300 !important; }
     .g-badge-cantine { background: rgba(251,146,60,0.3) !important; }
     .g-badge-peri { background: rgba(250,204,21,0.4) !important; }
+    .g-badge-actvac { background: rgba(250,204,21,0.4) !important; color: #92400e !important; }
 
     .g-bar-vac {
-        background: rgba(167,139,250,0.3) !important;
+        background: rgba(167,139,250,0.25) !important;
         color: #6d28d9 !important;
-        font-size: 5pt !important;
+        font-size: 4pt !important;
+        padding: 0 !important;
     }
 
     .dot { border: 1px solid #999 !important; }
