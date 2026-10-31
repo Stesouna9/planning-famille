@@ -49,6 +49,12 @@ const CONFIG = {
         { debut: "2027-07-03", fin: "2027-09-01", nom: "Été" }
     ],
 
+    /* --- Périscolaire hors mercredis (en plus des mercredis automatiques) --- */
+    PERISCOLAIRE_EXTRA: [
+        "2026-11-02", // lundi
+        "2026-12-08"  // mardi
+    ],
+
     /* --- Jours fériés --- */
     JOURS_FERIES: [
         // 2026

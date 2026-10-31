@@ -430,7 +430,7 @@ function getDayInfo(dateStr) {
         ferie: isFerie(dateStr),
         annulation: manual && manual.type === "annulation",
         note: manual ? manual.note : null,
-        periscolaire: dow === 3 && bothWork && !vac,
+        periscolaire: (dow === 3 && bothWork && !vac) || (CONFIG.PERISCOLAIRE_EXTRA || []).includes(dateStr),
         activiteVacances: vac && bothWork,
         cantine: bothWork && !vac && !isFerie(dateStr) && dow >= 1 && dow <= 5,
         dateStr
